@@ -1,0 +1,932 @@
+<title>Modul 5 Lernpfad Gesundheitssorge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: Kopfzeile mit Tabs, darunter eine Sprechblase als Einstieg; Lernpfad als vertikale Linie mit Stationen, Quiz und Karten als schmale Arbeitsflächen */
+:root{
+  --bg:#F8F3F4; --surface:#FFFFFF; --ink:#2A1B20; --muted:#6A5A5F; --line:#E4D7DA;
+  --accent:#8E2C48; --accent-ink:#FFFFFF; --accent-soft:#F4DEE5;
+  --note-bg:#FFF3D6; --note-ink:#4F3500; --note-line:#E3B13A;
+  --good:#17744A; --good-soft:#DDF3E7; --bad:#B42318; --bad-soft:#FBE4E0;
+  --c-s1:#8E2C48; --c-s2:#8A4B9C; --c-s3:#B15A0E; --c-s4:#2F62A8;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1B1316; --surface:#261B20; --ink:#F1E6E9; --muted:#C3AEB5; --line:#3E2D34;
+  --accent:#E58AA5; --accent-ink:#2B0E17; --accent-soft:#42202C;
+  --note-bg:#38300F; --note-ink:#F1E0B0; --note-line:#8A6A1B;
+  --good:#5BD08F; --good-soft:#14352A; --bad:#FF8F80; --bad-soft:#41201C;
+  --c-s1:#E58AA5; --c-s2:#D9A3EA; --c-s3:#F0A862; --c-s4:#8DB7F0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B1316; --surface:#261B20; --ink:#F1E6E9; --muted:#C3AEB5; --line:#3E2D34;
+  --accent:#E58AA5; --accent-ink:#2B0E17; --accent-soft:#42202C;
+  --note-bg:#38300F; --note-ink:#F1E0B0; --note-line:#8A6A1B;
+  --good:#5BD08F; --good-soft:#14352A; --bad:#FF8F80; --bad-soft:#41201C;
+  --c-s1:#E58AA5; --c-s2:#D9A3EA; --c-s3:#F0A862; --c-s4:#8DB7F0; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Kopf */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{padding-block:10px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.05rem;letter-spacing:.01em}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.tab{border:0;background:transparent;padding:7px 16px;border-radius:999px;font-weight:600;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* Einstieg */
+.hero{padding-block:28px 8px}
+.bubble[hidden]{display:none}
+.bubble{background:var(--accent);color:var(--accent-ink);padding:26px 28px 28px;border-radius:28px 28px 28px 6px;position:relative}
+.bubble h1{font-size:clamp(1.7rem,5vw,2.6rem);font-weight:700}
+.bubble p{margin:10px 0 0;max-width:56ch;opacity:.92}
+.srcs{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.srcs span{background:rgba(255,255,255,.18);border-radius:999px;padding:3px 12px;font-size:.88rem;font-weight:600}
+:root[data-theme="dark"] .srcs span{background:rgba(0,0,0,.18)}
+.prog{margin-top:18px;display:grid;gap:8px}
+.prog-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.95rem;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+
+/* Lernpfad */
+.path{list-style:none;margin:22px 0 0;padding:0;position:relative}
+.path::before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line)}
+.st{position:relative;padding-left:56px;margin-bottom:14px}
+.node{position:absolute;left:0;top:14px;width:40px;height:40px;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;color:var(--muted)}
+.st.done .node{background:var(--good);border-color:var(--good);color:#fff}
+.st.next .node{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.st-head{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:6px}
+.st.open .st-head{border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--accent)}
+.st-head h2{font-size:1.2rem}
+.st-head p{margin:0;color:var(--muted);font-size:.97rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid currentColor}
+.chip.s4{color:var(--c-s4)}.chip.s1{color:var(--c-s1)}.chip.s2{color:var(--c-s2)}.chip.s3{color:var(--c-s3)}
+.chip.state{color:var(--muted)}
+.st-body{display:none;background:var(--surface);border:1px solid var(--accent);border-top:0;border-radius:0 0 14px 14px;padding:6px 18px 18px}
+.st.open .st-body{display:block}
+.blk{margin-top:18px}
+.blk>h3{font-size:1.02rem;margin-bottom:8px;color:var(--accent)}
+.blk p{margin:0 0 8px}
+.blk ul,.blk ol{margin:0;padding-left:1.25em;display:grid;gap:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.gc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.gc b{display:block;font-family:var(--f-display);font-size:.98rem;margin-bottom:2px}
+.gc span{font-size:.95rem;color:var(--muted)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.95rem}
+th,td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--accent-soft);font-family:var(--f-display);font-size:.9rem}
+tr:last-child td{border-bottom:0}
+.note{background:var(--note-bg);color:var(--note-ink);border-left:4px solid var(--note-line);border-radius:0 10px 10px 0;padding:10px 14px}
+.note b{font-family:var(--f-display)}
+.quote{margin:0;padding:6px 0 6px 16px;border-left:3px solid var(--accent);font-style:italic}
+.quote small{display:block;font-style:normal;color:var(--muted)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 16px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+
+/* Werkzeugleisten */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:26px 0 16px}
+.tools label{display:grid;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted);min-width:0}
+select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;min-width:0;text-overflow:ellipsis}
+.tools label{flex:1 1 240px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:9px 14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+h2.sec{font-size:1.5rem;margin-top:28px}
+.lead{color:var(--muted);margin:6px 0 0}
+
+/* Quiz */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.qmeta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.92rem;margin-bottom:10px;flex-wrap:wrap}
+.qtext{font-family:var(--f-display);font-size:1.3rem;font-weight:500;margin:14px 0 16px;text-wrap:balance}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.opt .l{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-size:.85rem;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.fb{margin-top:16px;border-radius:12px;padding:12px 14px;background:var(--accent-soft)}
+.fb b{display:block;margin-bottom:2px}
+.fb.good b{color:var(--good)}.fb.bad b{color:var(--bad)}
+.ev{display:grid;gap:8px;margin-top:8px;font-weight:400;color:var(--ink)}
+.ev>div span{display:block;font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.run{margin-top:10px;font-size:.9rem;color:var(--muted)}
+.score small{font-size:1.2rem;color:var(--muted);font-weight:500}
+.srows{display:grid;gap:12px;margin-top:10px}
+.srow{display:grid;gap:6px}.srow .sn{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.srow .sn span{color:var(--muted);font-size:.9rem}
+.btn.sm{padding:5px 10px;font-size:.85rem;justify-self:start}
+.sum{margin:12px 0 0}
+.rvs{display:grid;gap:10px}
+.rv{border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:10px 12px}
+.rv.bad{border-left-color:var(--bad)}
+.rv summary{cursor:pointer;display:flex;gap:10px;font-weight:600}
+.rv .mk{flex:none;color:var(--good)}.rv.bad .mk{color:var(--bad)}
+.score{font-family:var(--f-display);font-size:3rem;font-weight:700;color:var(--accent)}
+.wl{display:grid;gap:10px;margin-top:14px}
+.wl div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.95rem}
+.wl div b{display:block}
+
+/* Karten */
+.stage{perspective:1200px;margin:6px 0 14px}
+.card{width:100%;min-height:260px;border:0;background:none;padding:0;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:auto;text-align:left}
+.front{background:var(--surface);border:1px solid var(--line)}
+.back{background:var(--accent);color:var(--accent-ink);transform:rotateY(180deg)}
+.face small{font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.75rem;opacity:.75}
+.face p{margin:0;font-family:var(--f-display);font-size:1.3rem;font-weight:500;text-wrap:balance}
+.back p{font-family:var(--f-body);font-size:1.12rem;font-weight:400;line-height:1.5}
+.cc{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.cc .mid{display:flex;gap:8px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:.9rem;margin-top:12px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+footer{margin-top:40px;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:520px){.panel{padding:16px}.face{padding:18px}.face p{font-size:1.15rem}.tab{padding:7px 11px}}
+@media (prefers-reduced-motion:reduce){.card,.bar>i{transition:none}}
+[hidden]{display:none!important}
+/* Übungen */
+.exl{display:grid;gap:18px;margin-top:20px}
+.ex{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:16px;padding:18px 20px}
+.ex.done{border-left-color:var(--good)}
+.ex .kick{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ex h3{font-size:1.3rem;margin:4px 0 6px}
+.ex p{margin:6px 0}
+.ex h4{font-family:var(--f-display);font-size:1rem;margin:14px 0 4px}
+.ex ul,.ex ol{margin:4px 0 0;padding-left:1.25em}
+.ex li{margin:3px 0}
+.ex .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ex .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ex .btn{text-decoration:none}
+.ex-frame{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.ex-frame iframe{display:block;width:100%;height:78vh;min-height:520px;border:0}
+.ex-sec{font-size:1.15rem;margin-top:30px}
+.story{background:var(--note-bg);color:var(--note-ink);border-left:4px solid var(--note-line);border-radius:10px;padding:10px 14px;margin:8px 0}
+a.go{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline}
+
+input[type=search],textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;min-width:0;font:inherit;color:inherit}
+textarea{resize:vertical}
+.law{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--surface)}
+.law summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.law summary b{font-family:var(--f-display);color:var(--accent)}
+.law summary span{color:var(--muted);font-size:.95rem}
+.lawx{padding:0 14px 12px;font-size:.97rem}
+.lawx p{margin:6px 0}
+.lawx .src{display:inline-block;margin-top:6px;font-size:.88rem;color:var(--accent)}
+.navlog{margin:10px 0;padding-left:1.25em;color:var(--muted);font-size:.93rem}
+.navlog b{color:var(--ink)}
+.rv ul{margin:8px 0 0}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="brand">Modul 5 · Gesundheitssorge</div>
+  <div class="tabs" role="tablist" aria-label="Bereiche">
+    <button class="tab" role="tab" id="t-path" data-tab="path" aria-selected="true">Lernpfad</button>
+    <button class="tab" role="tab" id="t-quiz" data-tab="quiz" aria-selected="false">Quiz</button>
+    <button class="tab" role="tab" id="t-cards" data-tab="cards" aria-selected="false">Karten</button>
+    <button class="tab" role="tab" id="t-laws" data-tab="laws" aria-selected="false">Gesetze</button>
+    <button class="tab" role="tab" id="t-ex" data-tab="ex" aria-selected="false">Übungen</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="bubble">
+      <h1>Gesundheitssorge, Patientenverfügung und Sterben</h1>
+      <p>Lernhilfe zum Sachkundelehrgang für berufliche Betreuer: Behandlungsvertrag, Einwilligung, gerichtliche Genehmigungen, Patientenverfügung und Sterbewunsch, mit Gesetzestexten, Quiz, Karteikarten und Übungen.</p>
+    </div>
+    <div class="prog">
+      <div class="prog-row"><span id="p-text"></span><span id="p-extra"></span></div>
+      <div class="bar"><i id="p-bar" style="width:0%"></i></div>
+    </div>
+  </section>
+
+  <!-- LERNPFAD -->
+  <section id="v-path" aria-labelledby="t-path">
+    <ol class="path" id="path"></ol>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="v-quiz" aria-labelledby="t-quiz" hidden>
+    <h2 class="sec">Quiz</h2>
+    <p class="lead">Wähle ein Thema und die Anzahl der Fragen. Nach jeder Antwort siehst du die Erklärung mit den Rechtsgrundlagen.</p>
+    <div class="tools">
+      <label for="q-topic">Thema<select id="q-topic"></select></label>
+      <div><div style="font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:4px">Fragen</div>
+        <div class="seg" id="q-count"><button data-n="10" aria-pressed="true">10</button><button data-n="20" aria-pressed="false">20</button><button data-n="999" aria-pressed="false">Alle</button></div></div>
+      <button class="btn pri" id="q-start">Quiz starten</button>
+    </div>
+    <div id="q-area"></div>
+  </section>
+
+  <!-- KARTEN -->
+  <section id="v-cards" aria-labelledby="t-cards" hidden>
+    <h2 class="sec">Karteikarten</h2>
+    <p class="lead">Karte antippen zum Umdrehen. Pfeiltasten blättern, Leertaste dreht um.</p>
+    <div class="tools">
+      <label for="c-topic">Thema<select id="c-topic"></select></label>
+      <div><div style="font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:4px">Anzeige</div>
+        <div class="seg" id="c-mode"><button data-m="all" aria-pressed="true">Alle</button><button data-m="open" aria-pressed="false">Nur offene</button></div></div>
+      <button class="btn" id="c-shuffle">Mischen</button>
+    </div>
+    <div id="c-area"></div>
+  </section>
+
+  <!-- GESETZE -->
+  <section id="v-laws" aria-labelledby="t-laws" hidden>
+    <h2 class="sec">Gesetze</h2>
+    <p class="lead">Die wichtigsten Vorschriften im Wortlaut. Suche nach Paragraf oder Stichwort.</p>
+    <div class="tools">
+      <label for="l-q">Suche<input id="l-q" type="search" placeholder="z. B. 1829 oder Patientenverfügung" autocomplete="off"></label>
+      <div><div style="font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:4px">Gesetz</div>
+        <div class="seg" id="l-f"><button data-f="all" aria-pressed="true">Alle</button><button data-f="BGB" aria-pressed="false">BGB</button><button data-f="FamFG" aria-pressed="false">FamFG</button></div></div>
+    </div>
+    <p class="hint" id="l-count" style="margin:0 0 10px"></p>
+    <div id="l-list"></div>
+    <p class="hint">Stand der Texte: gesetze-im-internet.de zum Zeitpunkt der Erstellung. Maßgeblich ist stets die aktuelle amtliche Fassung.</p>
+  </section>
+
+  <!-- ÜBUNGEN -->
+  <section id="v-ex" aria-labelledby="t-ex" hidden>
+    <h2 class="sec">Übungen</h2>
+    <p class="lead">Ein Entscheidungs-Navigator, vier Fälle mit Lösungsskizze und Reflexionsfragen. Notizen bleiben nur in deinem Browser.</p>
+    <div class="exl" id="ex-list"></div>
+  </section>
+
+  <footer>Die Seite fasst die Inhalte des Moduls zusammen. Sie ersetzt weder die Unterlagen noch eine Rechtsberatung. Gesetzestexte: gesetze-im-internet.de. Der Lernfortschritt wird nur in diesem Browser gespeichert.</footer>
+</main>
+
+<script>
+"use strict";
+/* ---------- Inhalte ---------- */
+const SRC={D:"Unterrichtsfolien",M:"Arbeitsmaterial",G:"Gesetz",W:"Frei verfügbar"};const SCLS={D:"s1",M:"s2",G:"s3",W:"s4"};
+const ST=[
+{id:1,t:"Überblick: Personensorge 2 und Vertragsgrundlagen",src:"DG",teaser:"Die vier Themen des Moduls, die wichtigsten Vorschriften und die Grundlagen zum Zustandekommen von Verträgen.",
+ b:[
+ {k:"p",t:"Modul 5 behandelt die Gesundheitssorge im Betreuungsrecht: Wie kommt ein Behandlungsvertrag zustande, wer darf in ärztliche Maßnahmen einwilligen, wann muss das Gericht zustimmen und was gilt für Patientenverfügung und Sterbewunsch?"},
+ {k:"grid",h:"Die vier Themenblöcke",i:[
+  ["1. Behandlungsvertragsrecht","§§ 630a bis 630h BGB: Pflichten, Aufklärung, Einwilligung, Dokumentation, Beweislast"],
+  ["2. Einwilligungsfähigkeit und Patientenrechte","Wer entscheidet? Haftungsrechtlicher Hintergrund und ersatzweise Einwilligung des Betreuers"],
+  ["3. Gefährliche ärztliche Maßnahmen","§ 1829 BGB und § 298 FamFG: Voraussetzungen und Verfahren der Genehmigung"],
+  ["4. Wünsche, Patientenverfügung, Sterbewunsch","§ 1821, § 1827, § 1828 BGB: Behandlungswünsche, mutmaßlicher Wille, Patientenverfügung"]]},
+ {k:"table",h:"Relevante Vorschriften",c:["Norm","Thema"],r:[
+  ["§§ 630a–630h BGB","Behandlungsvertrag"],
+  ["§ 1821 BGB","Pflichten des Betreuers, Wünsche des Betreuten"],
+  ["§§ 1827–1830 BGB","Patientenverfügung, Gespräch zur Feststellung des Willens, Genehmigung ärztlicher Maßnahmen, Sterilisation"],
+  ["§ 1832 BGB","Ärztliche Zwangsmaßnahmen"],
+  ["§ 298 FamFG, § 312 Nr. 3 FamFG","Verfahren bei ärztlichen Maßnahmen und bei Zwangsmaßnahmen"]]},
+ {k:"ul",h:"Grundlagen: Zustandekommen von Verträgen",i:["<b>Willenserklärung:</b> äußert einen Rechtsbindungswillen","<b>Vertragsschluss:</b> übereinstimmende Willenserklärungen, Angebot und Annahme","<b>Mängelbehaftete Rechtsgeschäfte:</b> Geschäftsunfähigkeit, Formmängel, Willensmängel","<b>Stellvertretung:</b> Der Betreuer handelt innerhalb seines Aufgabenkreises für den Betreuten (§ 1823 BGB)"]},
+ {k:"note",t:"<b>Merke:</b> Die Anordnung einer Betreuung macht nicht automatisch geschäftsunfähig. Geschäftsunfähig ist, wer sich in einem die freie Willensbestimmung ausschließenden Zustand krankhafter Störung der Geistestätigkeit befindet (§ 104 Nr. 2 BGB). Ein Einwilligungsvorbehalt (§ 1825 BGB) muss gesondert angeordnet werden."},
+ {k:"p",h:"Leitgedanke",t:"Der Betreuer besorgt die Angelegenheiten so, dass der Betreute sein Leben nach seinen <b>Wünschen</b> gestalten kann (§ 1821 Abs. 2 BGB). Das gilt auch in der Gesundheitssorge und prägt alle folgenden Stationen."}
+ ]},
+{id:2,t:"Behandlungsvertrag (§§ 630a bis 630h BGB)",src:"DG",teaser:"Pflichten von Behandelndem und Patient, Information, Einwilligung, Aufklärung, Dokumentation, Akteneinsicht und Beweislast.",
+ b:[
+ {k:"p",t:"Der Behandlungsvertrag ist ein eigener Vertragstyp. Er ist seit dem Patientenrechtegesetz 2013 im BGB geregelt. Der Betreuer schließt ihn im Rahmen des Aufgabenkreises für den Betreuten ab und übt dessen Rechte aus."},
+ {k:"table",h:"Überblick über die Vorschriften",c:["Norm","Inhalt","Kernaussage"],r:[
+  ["§ 630a","Vertragstypische Pflichten","Behandelnder schuldet die versprochene Behandlung nach dem allgemein anerkannten fachlichen Standard, Patient die Vergütung, soweit kein Dritter zahlt"],
+  ["§ 630b","Anwendbare Vorschriften","Ergänzend gilt das Dienstvertragsrecht"],
+  ["§ 630c","Mitwirkung, Informationspflichten","Zusammenwirken; Erläuterung der wesentlichen Umstände; Information über Behandlungsfehler auf Nachfrage oder zur Gefahrenabwehr; Kosteninformation in Textform"],
+  ["§ 630d","Einwilligung","Vor jeder medizinischen Maßnahme; bei Einwilligungsunfähigkeit des Berechtigten; wirksam nur nach Aufklärung; jederzeit formlos widerrufbar"],
+  ["§ 630e","Aufklärung","Mündlich, rechtzeitig, verständlich; Risiken, Alternativen; Abschriften aushändigen"],
+  ["§ 630f","Dokumentation","Behandlungsakte, zeitnah, nachvollziehbare Änderungen, Aufbewahrung zehn Jahre"],
+  ["§ 630g","Einsichtnahme","Einsicht in die vollständige Akte, erste Abschrift unentgeltlich"],
+  ["§ 630h","Beweislast","Vermutungen bei voll beherrschbarem Risiko, fehlender Dokumentation, grobem Behandlungsfehler; Behandelnder beweist Einwilligung und Aufklärung"]]},
+ {k:"ol",h:"Ablauf in der Praxis",i:["Behandlungsvertrag und Information über Diagnose, Prognose und Therapie (§ 630c)","Aufklärung des Berechtigten (§ 630e) vor der Einwilligung","Einwilligung des Patienten oder, bei Einwilligungsunfähigkeit, des Berechtigten (§ 630d)","Behandlung nach fachlichem Standard (§ 630a) mit Dokumentation (§ 630f)","Einsicht in die Akte und Durchsetzung von Ansprüchen (§§ 630g, 630h)"]},
+ {k:"note",t:"<b>Praxis:</b> Fehlt die Aufklärung oder die Einwilligung, ist der Eingriff rechtswidrig. Im Streit trägt der Behandelnde die Beweislast dafür, dass er aufgeklärt hat und die Einwilligung vorlag (§ 630h Abs. 2)."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb630a","bgb630b","bgb630c","bgb630d","bgb630e","bgb630f","bgb630g","bgb630h"]}
+ ]},
+{id:3,t:"Einwilligung und Einwilligungsfähigkeit",src:"DGW",teaser:"Wer entscheidet über ärztliche Maßnahmen? Fähigkeiten im Recht, Aufklärung, ersatzweise Einwilligung und Prüfschema.",
+ b:[
+ {k:"note",t:"<b>Grundsatz:</b> Ein einwilligungsfähiger Patient entscheidet stets selbst. Nur wenn der Betreute für die konkrete Maßnahme einwilligungsunfähig ist, willigt der Betreuer ersatzweise ein."},
+ {k:"grid",h:"Fähigkeiten in der Rechtsordnung",i:[
+  ["Rechtsfähigkeit","Träger von Rechten und Pflichten sein"],
+  ["Geschäftsfähigkeit","Rechtsgeschäfte wirksam schließen"],
+  ["Testierfähigkeit","Ein Testament errichten"],
+  ["Prozessfähigkeit","Prozesshandlungen vornehmen"],
+  ["Verfahrensfähigkeit","Verfahrenshandlungen vornehmen"],
+  ["Einwilligungsfähigkeit","Natürliche Einsichtsfähigkeit: Tragweite und Risiken einer Entscheidung abschätzen und danach handeln"]]},
+ {k:"ul",h:"Merkmale der Einwilligungsfähigkeit",i:["Sie wird <b>für die konkrete Maßnahme</b> beurteilt, nicht allgemein.","Sie ist nicht mit der Geschäftsfähigkeit identisch.","Geprüft werden in der Praxis meist vier Teilfähigkeiten: Informationen verstehen, ihre Bedeutung für sich einschätzen, abwägen und eine Entscheidung äußern.","Die Beurteilung trifft zunächst der behandelnde Arzt. Zweifel sind zu dokumentieren."]},
+ {k:"p",h:"Haftungsrechtlicher Hintergrund",t:"Jeder ärztliche Eingriff erfüllt den Tatbestand einer Körperverletzung (§ 223 StGB). Erst die wirksame Einwilligung rechtfertigt ihn. Ohne Einwilligung drohen strafrechtliche und zivilrechtliche Folgen. Deshalb sind Aufklärung und Einwilligung die zentralen Punkte des Behandlungsvertragsrechts."},
+ {k:"ol",h:"Prüfschema für die Einwilligung beim Betreuten",i:["Ist die Gesundheitssorge im Aufgabenkreis enthalten?","Ist der Betreute für diese Maßnahme einwilligungsfähig? Wenn ja, entscheidet er selbst.","Wenn nein: Aufklärung des Betreuers (§ 630e Abs. 4) und Einbeziehung des Betreuten nach seinem Verständnis (Abs. 5)","Patientenverfügung prüfen (§ 1827 Abs. 1), sonst Behandlungswünsche und mutmaßlicher Wille (§ 1827 Abs. 2)","Genehmigungsbedürftig? Gefahr von Tod oder schwerem Schaden (§ 1829) oder Zwangsmaßnahme (§ 1832)","Einwilligung, Nichteinwilligung oder Widerruf erklären und dokumentieren"]},
+ {k:"table",h:"Eilfälle und Widerruf",c:["Situation","Regel"],r:[
+  ["Unaufschiebbare Maßnahme, Einwilligung nicht rechtzeitig erreichbar","Durchführung ohne Einwilligung, wenn sie dem mutmaßlichen Willen entspricht (§ 630d Abs. 1 S. 4)"],
+  ["Widerruf","Jederzeit, ohne Gründe und formlos (§ 630d Abs. 3)"],
+  ["Aufklärungsverzicht","Aufklärung entfällt, wenn der Patient ausdrücklich verzichtet oder die Maßnahme unaufschiebbar ist (§ 630e Abs. 3)"]]},
+ {k:"law",h:"Gesetzestexte",ids:["bgb630d","bgb630e"]}
+ ]},
+{id:4,t:"Gefährliche ärztliche Maßnahmen: Genehmigung (§ 1829 BGB, § 298 FamFG)",src:"DGW",teaser:"Wann das Betreuungsgericht zustimmen muss, wann nicht, und wie das Verfahren abläuft.",
+ b:[
+ {k:"table",h:"§ 1829 BGB im Überblick",c:["Absatz","Regel"],r:[
+  ["Abs. 1","Einwilligung des Betreuers in Untersuchung, Heilbehandlung oder Eingriff braucht die Genehmigung, wenn die begründete Gefahr besteht, dass der Betreute stirbt oder einen schweren und länger dauernden gesundheitlichen Schaden erleidet. Ohne Genehmigung nur, wenn mit dem Aufschub Gefahr verbunden ist."],
+  ["Abs. 2","Nichteinwilligung oder Widerruf braucht die Genehmigung, wenn die Maßnahme medizinisch angezeigt ist und durch das Unterbleiben oder den Abbruch die begründete Gefahr von Tod oder schwerem, länger dauerndem Schaden besteht."],
+  ["Abs. 3","Die Genehmigung ist zu erteilen, wenn die Entscheidung dem Willen des Betreuten entspricht."],
+  ["Abs. 4","Keine Genehmigung bei Einvernehmen zwischen Betreuer und behandelndem Arzt, dass die Entscheidung dem nach § 1827 festgestellten Willen entspricht."],
+  ["Abs. 5","Gilt für einen Bevollmächtigten entsprechend, soweit seine Vollmacht die Maßnahme nach § 1820 Abs. 2 Nr. 1 ausdrücklich umfasst."]]},
+ {k:"ol",h:"Prüfschema § 1829",i:["Betreuer hat Gesundheitssorge und der Betreute ist einwilligungsunfähig","Maßnahme: Untersuchung, Heilbehandlung oder ärztlicher Eingriff","Gefahr von Tod oder schwerem, länger dauerndem Schaden durch die Maßnahme (Abs. 1) oder durch das Unterbleiben einer angezeigten Maßnahme (Abs. 2)","Einvernehmen von Arzt und Betreuer über den festgestellten Willen? Dann keine Genehmigung (Abs. 4)","Sonst Genehmigung beantragen. Sie ist zu erteilen, wenn die Entscheidung dem Willen entspricht (Abs. 3)","Eilfall: Maßnahme ohne Genehmigung, wenn mit dem Aufschub Gefahr verbunden ist (Abs. 1 S. 2)"]},
+ {k:"table",h:"Verfahren nach § 298 FamFG",c:["Absatz","Regel"],r:[
+  ["Abs. 1","Genehmigung nur nach persönlicher Anhörung des Betroffenen. Die sonstigen Beteiligten sollen angehört werden, auf Verlangen auch eine nahestehende Person."],
+  ["Abs. 2","Ein Verfahrenspfleger ist stets zu bestellen, wenn Gegenstand die Genehmigung nach § 1829 Abs. 2 BGB ist (Nichteinwilligung, Widerruf)."],
+  ["Abs. 3","Vor der Genehmigung ist ein Sachverständigengutachten einzuholen. Der Sachverständige soll nicht der behandelnde Arzt sein."]]},
+ {k:"note",t:"<b>Beispiele:</b> Genehmigungsbedürftig sein können etwa eine Operation mit erheblichem Todesrisiko (Abs. 1) oder der Abbruch einer künstlichen Ernährung bei fehlendem Einvernehmen (Abs. 2). Eine Vorsorgevollmacht umfasst solche Entscheidungen nur, wenn sie schriftlich erteilt ist und die Maßnahmen ausdrücklich nennt (§ 1820 Abs. 2 Nr. 1)."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1829","famfg298","bgb1820"]}
+ ]},
+{id:5,t:"Sterilisation, Unterbringung und Zwangsmaßnahmen (§§ 1830 bis 1832 BGB)",src:"GW",teaser:"Weitere genehmigungsbedürftige Entscheidungen in der Personensorge und das gerichtliche Verfahren in Unterbringungssachen.",
+ b:[
+ {k:"grid",h:"Die drei Tatbestände",i:[
+  ["Sterilisation (§ 1830)","Nur durch einen besonderen Sterilisationsbetreuer, bei dauerhafter Einwilligungsunfähigkeit und unter strengen Voraussetzungen. Genehmigung nötig, Durchführung frühestens zwei Wochen nach Wirksamkeit."],
+  ["Freiheitsentziehende Unterbringung (§ 1831)","Zulässig, solange erforderlich wegen Selbsttötungs- oder erheblicher Selbstschädigungsgefahr oder zur notwendigen Heilbehandlung bei fehlender Einsicht. Genehmigung nötig."],
+  ["Ärztliche Zwangsmaßnahme (§ 1832)","Behandlung gegen den natürlichen Willen. Nur unter sieben Voraussetzungen, stationär im Krankenhaus, mit Genehmigung."]]},
+ {k:"ul",h:"Sterilisation (§ 1830), Voraussetzungen",i:["Sie entspricht dem natürlichen Willen des Betreuten.","Der Betreute bleibt auf Dauer einwilligungsunfähig.","Ohne Sterilisation käme es zu einer Schwangerschaft.","Diese würde eine Gefahr für das Leben oder eine schwerwiegende Gesundheitsbeeinträchtigung der Schwangeren bedeuten, die nicht zumutbar abwendbar ist.","Die Schwangerschaft kann nicht durch andere zumutbare Mittel verhindert werden."]},
+ {k:"ul",h:"Unterbringung (§ 1831)",i:["Mit Genehmigung des Betreuungsgerichts, ohne Genehmigung nur bei Gefahr im Aufschub; die Genehmigung ist unverzüglich nachzuholen (Abs. 2).","Der Betreuer beendet die Unterbringung, wenn die Voraussetzungen wegfallen, und zeigt das dem Gericht an (Abs. 3).","Gleichgestellt sind freiheitsentziehende Maßnahmen in Einrichtungen durch mechanische Vorrichtungen, Medikamente oder auf andere Weise über längere Zeit oder regelmäßig (Abs. 4).","Ein Bevollmächtigter braucht dafür eine schriftliche Vollmacht, die die Unterbringung ausdrücklich nennt (§ 1820 Abs. 2 Nr. 2)."]},
+ {k:"ol",h:"Ärztliche Zwangsmaßnahme (§ 1832 Abs. 1), alle sieben Voraussetzungen",i:["Die Maßnahme ist notwendig, um einen drohenden erheblichen gesundheitlichen Schaden abzuwenden.","Der Betreute kann wegen psychischer Krankheit oder geistiger oder seelischer Behinderung die Notwendigkeit nicht erkennen oder nicht danach handeln.","Sie entspricht dem nach § 1827 zu beachtenden Willen.","Zuvor wurde ernsthaft, mit dem nötigen Zeitaufwand und ohne unzulässigen Druck versucht, den Betreuten zu überzeugen.","Der Schaden ist durch keine weniger belastende Maßnahme abwendbar.","Der zu erwartende Nutzen überwiegt die Beeinträchtigungen deutlich.","Die Maßnahme erfolgt im Rahmen eines stationären Aufenthalts in einem Krankenhaus mit gebotener Versorgung und Nachbehandlung."]},
+ {k:"p",t:"Die Einwilligung braucht die Genehmigung des Betreuungsgerichts (Abs. 2). Sie ist zu widerrufen, wenn die Voraussetzungen wegfallen (Abs. 3). Für die Verbringung in ein Krankenhaus gegen den natürlichen Willen gilt § 1831 Abs. 1 Nr. 2, Abs. 2 und 3 S. 1 entsprechend (Abs. 4)."},
+ {k:"table",h:"Verfahren in Unterbringungssachen (FamFG)",c:["Norm","Regel"],r:[
+  ["§ 312","Unterbringungssachen: Unterbringung, freiheitsentziehende Maßnahmen und ärztliche Zwangsmaßnahmen nach BGB, außerdem Verfahren nach Landesgesetzen (PsychKG)"],
+  ["§ 319","Persönliche Anhörung und persönlicher Eindruck, möglichst in der üblichen Umgebung"],
+  ["§ 321","Förmliche Beweisaufnahme durch Gutachten; Sachverständiger soll Arzt für Psychiatrie sein; bei Zwangsmaßnahme nicht der zwangsbehandelnde Arzt"],
+  ["§ 331","Einstweilige Anordnung bei dringenden Gründen und dringendem Bedürfnis, mit ärztlichem Zeugnis, Anhörung und gegebenenfalls Verfahrenspfleger"],
+  ["§ 333","Einstweilige Anordnung höchstens sechs Wochen, mit Verlängerung insgesamt höchstens drei Monate; bei ärztlicher Zwangsmaßnahme höchstens zwei Wochen, insgesamt höchstens sechs Wochen"]]},
+ {k:"note",t:"<b>Abgrenzung:</b> Die zivilrechtliche Unterbringung durch den Betreuer (§ 1831 BGB) dient dem Schutz des Betreuten. Die öffentlich-rechtliche Unterbringung nach den Landesgesetzen (PsychKG) dient der Gefahrenabwehr. Beide sind Unterbringungssachen nach § 312 FamFG."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1830","bgb1831","bgb1832","famfg312","famfg319","famfg321","famfg331","famfg333"]}
+ ]},
+{id:6,t:"Wünsche, mutmaßlicher Wille und Gespräch (§§ 1821, 1827 Abs. 2, 1828 BGB)",src:"DG",teaser:"Handlungsleitend sind die Wünsche des Betreuten. Wie sie festgestellt werden und wo die Grenze liegt.",
+ b:[
+ {k:"ol",h:"Stufenfolge der Willensermittlung",i:["<b>Patientenverfügung:</b> Trifft sie auf die aktuelle Lebens- und Behandlungssituation zu, verschafft der Betreuer dem Willen Ausdruck und Geltung (§ 1827 Abs. 1).","<b>Behandlungswünsche:</b> Gibt es keine Patientenverfügung oder passt sie nicht, stellt der Betreuer die Wünsche fest (§ 1827 Abs. 2, § 1821 Abs. 2).","<b>Mutmaßlicher Wille:</b> Lassen sich Wünsche nicht feststellen, wird der Wille aufgrund konkreter Anhaltspunkte ermittelt (§ 1821 Abs. 4, § 1827 Abs. 2)."]},
+ {k:"ul",h:"Konkrete Anhaltspunkte für den mutmaßlichen Willen",i:["Frühere Äußerungen","Ethische oder religiöse Überzeugungen","Sonstige persönliche Wertvorstellungen","Auskünfte naher Angehöriger und Vertrauenspersonen, soweit ohne erhebliche Verzögerung möglich (§ 1828 Abs. 2)"]},
+ {k:"note",t:"<b>Grenze (§ 1821 Abs. 3):</b> Wünschen muss der Betreuer nicht entsprechen, wenn (1) die Person oder das Vermögen erheblich gefährdet würde <b>und</b> der Betreute die Gefahr wegen Krankheit oder Behinderung nicht erkennen oder nicht danach handeln kann, oder (2) es dem Betreuer nicht zuzumuten ist. Beide Elemente der ersten Alternative müssen vorliegen."},
+ {k:"p",h:"Gespräch zur Feststellung des Patientenwillens (§ 1828)",t:"Der behandelnde Arzt prüft, welche Maßnahme im Hinblick auf Gesamtzustand und Prognose indiziert ist. Er und der Betreuer erörtern sie unter Berücksichtigung des Patientenwillens als Grundlage der Entscheidung nach § 1827. Das gilt für Bevollmächtigte entsprechend."},
+ {k:"ul",h:"Weitere Pflichten aus § 1821",i:["Persönlichen Kontakt halten und sich regelmäßig einen persönlichen Eindruck verschaffen (Abs. 5)","Dem Betreuten helfen, seine Angelegenheiten selbst zu besorgen, und Vertretungsmacht nur nutzen, soweit erforderlich (Abs. 1)","Die Fähigkeit des Betreuten zur eigenen Besorgung wiederherstellen oder verbessern (Abs. 6)"]},
+ {k:"note",t:"<b>Praxis:</b> Gespräche, Auskünfte der Angehörigen und die Herleitung des mutmaßlichen Willens zeitnah und nachvollziehbar dokumentieren. Nur so lässt sich später die Übereinstimmung mit dem Willen belegen (Einvernehmen nach § 1829 Abs. 4)."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1821","bgb1828"]}
+ ]},
+{id:7,t:"Patientenverfügung und Vorsorge (§ 1827, § 1820, § 1816 Abs. 2 BGB)",src:"DGW",teaser:"Vorsorgevollmacht, Betreuungsverfügung und Patientenverfügung im Vergleich, Voraussetzungen und Bindungswirkung.",
+ b:[
+ {k:"table",h:"Die drei Vorsorgeinstrumente im Vergleich",c:["","Vorsorgevollmacht","Betreuungsverfügung","Patientenverfügung"],r:[
+  ["Norm","§ 1820 BGB","§ 1816 Abs. 2 BGB","§ 1827 BGB"],
+  ["Inhalt","Bestimmung eines Stellvertreters für individuell festgelegte Aufgabenbereiche","Vorschlag an das Betreuungsgericht, wer als Betreuer eingesetzt werden soll","Handlungsanweisung an Betreuer oder Bevollmächtigte und Ärzte über künftige ärztliche Maßnahmen"],
+  ["Form","Grundsätzlich formfrei; Schriftform bei Maßnahmen nach § 1820 Abs. 2","Ein Dokument, üblicherweise schriftlich","Schriftform"],
+  ["Fähigkeit","Geschäftsfähigkeit","Keine Geschäftsfähigkeit erforderlich","Einwilligungsfähigkeit, nicht Geschäftsfähigkeit"],
+  ["Widerruf","Jederzeit","Jederzeit","Jederzeit und formlos"],
+  ["Besonderheit","Maßnahmen nach § 1829, § 1831, § 1832 nur bei schriftlicher und ausdrücklicher Erteilung","Wer sie besitzt, muss sie dem Gericht übermitteln","Regelmäßige Überprüfung empfohlen"]]},
+ {k:"ol",h:"Patientenverfügung: Voraussetzungen und Umgang (§ 1827 Abs. 1)",i:["Volljähriger, einwilligungsfähiger Verfasser","Schriftliche Festlegung der Einwilligung oder Untersagung bestimmter Maßnahmen, die noch nicht unmittelbar bevorstehen","Der Betreuer prüft, ob die Festlegungen auf die aktuelle Lebens- und Behandlungssituation zutreffen","Trifft das zu, verschafft er dem Willen Ausdruck und Geltung","Jederzeit formloser Widerruf"]},
+ {k:"ul",h:"Weitere Regeln",i:["Sie gilt unabhängig von Art und Stadium der Erkrankung (Abs. 3), eine Reichweitenbeschränkung gibt es nicht.","Der Betreuer soll in geeigneten Fällen auf die Möglichkeit hinweisen und auf Wunsch bei der Errichtung unterstützen (Abs. 4).","Niemand muss eine Patientenverfügung errichten. Errichtung oder Vorlage darf nicht zur Bedingung eines Vertragsschlusses gemacht werden (Abs. 5).","Für Bevollmächtigte gelten die Absätze 1 bis 3 entsprechend (Abs. 6)."]},
+ {k:"p",h:"Rechtsprechung zur Bestimmtheit",t:"Der Bundesgerichtshof stellt Anforderungen an die Bestimmtheit: Die Patientenverfügung muss erkennen lassen, in welchen Behandlungssituationen welche Maßnahmen gewollt oder abgelehnt werden. Die bloße Formel „keine lebenserhaltenden Maßnahmen“ genügt für sich allein nicht, konkretere Angaben zu Krankheitssituationen oder Maßnahmen sind erforderlich (BGH, Beschl. v. 6.7.2016, XII ZB 61/16, und v. 8.2.2017, XII ZB 604/15). Ist die Verfügung zu unbestimmt, gilt die Stufenfolge der Willensermittlung weiter."},
+ {k:"note",t:"<b>Hinweis:</b> Vorsorgevollmacht und Betreuungsverfügung können im Zentralen Vorsorgeregister der Bundesnotarkammer registriert werden. Dann erfährt das Betreuungsgericht schnell davon."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1827","bgb1820"]}
+ ]},
+{id:8,t:"Sterbewunsch, Behandlungsabbruch und Sterbehilfe",src:"GW",teaser:"Begriffe, Rechtsprechung, Umgang mit einem Sterbewunsch und Hilfsangebote.",
+ b:[
+ {k:"table",h:"Begriffe und rechtliche Einordnung",c:["Form","Bedeutung","Rechtliche Lage"],r:[
+  ["Tötung auf Verlangen","Gezielte Tötung auf ausdrückliches Verlangen","Strafbar (§ 216 StGB)"],
+  ["Behandlungsabbruch","Verzicht auf, Begrenzung oder Beendigung einer lebenserhaltenden Behandlung","Zulässig, wenn sie dem Patientenwillen entspricht (Rechtsprechung des BGH, Urteil vom 25.6.2010, 2 StR 454/09)"],
+  ["Indirekte Sterbehilfe","Schmerzlinderung, bei der eine Lebensverkürzung als Nebenfolge in Kauf genommen wird","Zulässig bei entsprechendem Patientenwillen"],
+  ["Suizidhilfe","Unterstützung bei einer freiverantwortlichen Selbsttötung","Das Bundesverfassungsgericht hat § 217 StGB (geschäftsmäßige Förderung der Selbsttötung) am 26.2.2020 für nichtig erklärt"]]},
+ {k:"ul",h:"Zur Entscheidung des BGH (2 StR 454/09)",i:["Ein Behandlungsabbruch ist gerechtfertigt, wenn er dem tatsächlichen oder mutmaßlichen Patientenwillen entspricht und dazu dient, einem ohne Behandlung zum Tode führenden Krankheitsprozess seinen Lauf zu lassen.","Es kommt nicht auf die Unterscheidung zwischen Tun und Unterlassen an, sondern auf den Behandlungsabbruch als Ganzes."]},
+ {k:"ul",h:"Umgang mit einem Sterbewunsch",i:["<b>Ernst nehmen und nachfragen:</b> Hinter dem Wunsch stehen oft Schmerzen, Angst, Einsamkeit, Verlusterfahrungen oder das Gefühl, eine Last zu sein.","<b>Wunsch und Wille unterscheiden:</b> Ist der Wunsch Ausdruck einer Krankheit, etwa einer Depression, oder ein freier, einsichtiger Wille?","<b>Hilfen eröffnen:</b> ärztliche und psychiatrische Abklärung, Schmerztherapie, Palliativ- und Hospizangebote, soziale Unterstützung","<b>Selbstgefährdung:</b> Bei akuter Gefahr kommt eine Unterbringung nach § 1831 Abs. 1 Nr. 1 BGB in Betracht.","Die Entscheidung über eine Behandlung folgt der Stufenfolge aus Station 6."]},
+ {k:"grid",h:"Hilfsangebote am Lebensende",i:[
+  ["Palliativversorgung","Allgemeine und spezialisierte ambulante Palliativversorgung (SAPV, § 37b SGB V)"],
+  ["Hospiz","Stationäre Hospize (§ 39a SGB V) und ambulante Hospizdienste"],
+  ["Gespräch","Telefonseelsorge, kostenfrei: 0800 111 0 111 oder 0800 111 0 222"]]},
+ {k:"note",t:"<b>Hinweis:</b> Die Aufgabe des Betreuers ist es, Wünsche zu klären, Hilfen zu eröffnen und Behandlungswünsche umzusetzen. Eine Mitwirkung an einer Selbsttötung gehört nicht zu den Aufgaben des Betreuers."},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1831"]}
+ ]},
+{id:9,t:"Sterben, Tod und Trauer: Phasen und Begleitung",src:"MW",teaser:"Die fünf Sterbephasen mit typischen Aussagen und hilfreichem Verhalten, dazu Haltung und Selbstreflexion.",
+ b:[
+ {k:"p",t:"Das Phasenmodell der Sterbebegleitung (nach Kübler-Ross) gibt Orientierung. Es ist <b>kein starres Schema</b>: Phasen lassen sich nicht scharf abgrenzen, können sich überlagern, wiederkehren oder fehlen."},
+ {k:"table",h:"Die fünf Phasen",c:["Phase","Merkmale","Hilfreich"],r:[
+  ["1. Nicht-wahrhaben-Wollen","Der Befund wird nicht verkraftet, man weicht dem Ernst der Lage aus („Die Befunde wurden verwechselt“).","Gesprächsbereitschaft zeigen, nachfragen; Gespräch abbrechen, wenn die Tatsachen nicht mehr ertragen werden; kein Misstrauen gegen Arzt und Behandlung schüren, keine falschen Hoffnungen machen"],
+  ["2. Auflehnung und Zorn","Aggression nach außen oder gegen sich selbst, Neid, Isolation; Zorn kann auch verborgen werden (Verweigerung, trotziges Schweigen, neue Ansprüche).","Zorn tolerieren und nicht persönlich nehmen, nicht gereizt reagieren, zugewandt bleiben"],
+  ["3. Verhandeln","Das Unvermeidliche wird durch eine Art Handel hinausgeschoben, starkes Informationsbedürfnis.","Hoffnung zubilligen, ohne Illusionen zu stützen; über Maßnahmen informieren und einbeziehen; Seelsorge kann Schuldgefühle mildern"],
+  ["4. Depression","Resignation, Abschiedsschmerz, Rückzug. <b>Reaktive</b> Depression (Sorge um Angehörige, Ungeregeltes) und <b>vorbereitende</b> Depression (Schmerz über den endgültigen Abschied).","Wenige, nicht wechselnde Bezugspersonen; nahe bleiben, ohne sich aufzudrängen; Trauer zulassen; nach Wünschen fragen, auch wer bleiben soll"],
+  ["5. Annahme","Der Tod wird als Konsequenz und Erfüllung des Lebens angenommen, nicht freudig erwartet; Sinnfragen, Bereitschaft zur Seelsorge, letzte Regelungen.","Da sein, auch schweigend; kleine Zuwendungen; manches kann nicht mehr geregelt werden, weil Kraft fehlt"]]},
+ {k:"note",t:"<b>Haltung:</b> Patienten spüren oft, wenn Begleitende dem Thema Sterben ausweichen. Wer begleitet, sollte die eigene Haltung zu Tod, Verlust und Ritualen kennen. Dafür gibt es im Bereich <b>Übungen</b> Reflexionsfragen."},
+ {k:"ul",h:"Rechtliche Verbindungen",i:["Gesundheitssorge und Behandlungsentscheidungen: Stationen 3 bis 7","Behandlungsverzicht und Sterbewunsch: Station 8","Mit dem Tod des Betreuten endet die Betreuung. Offene Pflichten und Abrechnungen richten sich nach den Vorschriften zum Ende der Betreuung."]}
+ ]},
+{id:10,t:"Aufenthalt, Wohnen und Umgang (§§ 1833, 1834 BGB)",src:"GW",teaser:"Ergänzung: Aufgabe von Wohnraum, Aufenthaltsbestimmung und Bestimmung des Umgangs.",
+ b:[
+ {k:"note",t:"<b>Hinweis:</b> Diese Station stammt nicht aus den Unterrichtsfolien, sondern aus den Gesetzestexten. Sie ergänzt die Personensorge um Fragen des Wohnens und des Umgangs."},
+ {k:"table",h:"Überblick",c:["Norm","Regel"],r:[
+  ["§ 1833 Abs. 1","Aufgabe selbst genutzten Wohnraums nur nach Maßgabe von § 1821 Abs. 2 bis 4. Eine Gefährdung liegt insbesondere vor, wenn die Finanzierung trotz Ausschöpfung aller Ressourcen nicht möglich ist oder die häusliche Versorgung trotz aller ambulanten Dienste zu einer erheblichen gesundheitlichen Gefährdung führen würde."],
+  ["§ 1833 Abs. 2","Beabsichtigt der Betreuer die Aufgabe, zeigt er das dem Gericht unverzüglich unter Angabe der Gründe und der Sichtweise des Betreuten an."],
+  ["§ 1833 Abs. 3","Genehmigung nötig für Kündigung, Aufhebung des Mietverhältnisses, Vermietung des Wohnraums und Verfügung über das Grundstück, wenn dies mit der Aufgabe verbunden ist."],
+  ["§ 1834 Abs. 1","Den Umgang bestimmen darf der Betreuer mit Wirkung für und gegen Dritte nur, wenn der Betreute es wünscht oder eine konkrete Gefährdung im Sinne von § 1821 Abs. 3 Nr. 1 droht."],
+  ["§ 1834 Abs. 2","Die Aufenthaltsbestimmung umfasst das Recht, den Aufenthalt auch mit Wirkung für und gegen Dritte zu bestimmen und erforderlichenfalls die Herausgabe zu verlangen."],
+  ["§ 1834 Abs. 3","Bei Streit entscheidet das Betreuungsgericht auf Antrag."]]},
+ {k:"law",h:"Gesetzestexte",ids:["bgb1833","bgb1834"]}
+ ]},
+{id:11,t:"Prüfungsschema und Fälle",src:"W",teaser:"Das Gesamtschema für ärztliche Entscheidungen beim einwilligungsunfähigen Betreuten und Merklisten.",
+ b:[
+ {k:"ol",h:"Gesamtschema",i:["Aufgabenkreis Gesundheitssorge vorhanden, oder Vollmacht, die die Maßnahme umfasst?","Einwilligungsfähigkeit für die konkrete Maßnahme? Wenn ja, entscheidet der Betreute selbst.","Widerspricht die Maßnahme dem natürlichen Willen? Dann ärztliche Zwangsmaßnahme (§ 1832) mit sieben Voraussetzungen und Genehmigung.","Patientenverfügung, die auf die Situation zutrifft (§ 1827 Abs. 1)? Sonst Behandlungswünsche und mutmaßlicher Wille (§ 1827 Abs. 2).","Gespräch mit dem Arzt und Anhörung der Angehörigen (§ 1828).","Genehmigung nach § 1829, wenn Gefahr von Tod oder schwerem Schaden besteht, außer bei Einvernehmen (Abs. 4) oder Eilfall.","Entscheidung erklären, dokumentieren und die Beendigung prüfen, wenn die Voraussetzungen wegfallen."]},
+ {k:"table",h:"Merkliste: Genehmigungen in der Personensorge",c:["Maßnahme","Norm","Gericht muss"],r:[
+  ["Gefährliche ärztliche Maßnahme, Nichteinwilligung, Widerruf","§ 1829 BGB, § 298 FamFG","persönlich anhören, Gutachten einholen, bei Abs. 2 Verfahrenspfleger bestellen"],
+  ["Sterilisation","§ 1830 BGB","genehmigen; Durchführung frühestens zwei Wochen später"],
+  ["Freiheitsentziehende Unterbringung und Maßnahmen","§ 1831 BGB, §§ 312 ff. FamFG","anhören, Gutachten einholen, Dauer begrenzen"],
+  ["Ärztliche Zwangsmaßnahme","§ 1832 BGB, §§ 312 ff. FamFG","wie Unterbringung; Gutachter nicht der zwangsbehandelnde Arzt"],
+  ["Kündigung der Wohnung","§ 1833 Abs. 3 BGB","genehmigen"]]},
+ {k:"note",t:"<b>Üben:</b> Im Bereich <b>Übungen</b> führt dich ein Entscheidungsnavigator durch das Schema, dazu gibt es vier Fälle mit Lösungsskizze."}
+ ]}
+];
+
+const QZ0=[
+[1,"Welche Voraussetzung gilt für die Geschäftsunfähigkeit nach § 104 Nr. 2 BGB?","Ein die freie Willensbestimmung ausschließender Zustand krankhafter Störung der Geistestätigkeit","Die Anordnung einer Betreuung für alle Angelegenheiten","Ein Alter von über 80 Jahren","Die Anordnung eines Einwilligungsvorbehalts","Betreuung allein macht nicht geschäftsunfähig. Entscheidend ist der Zustand krankhafter Störung der Geistestätigkeit, der die freie Willensbestimmung ausschließt."],
+[1,"Was bewirkt ein Einwilligungsvorbehalt (§ 1825 BGB)?","Er muss gesondert angeordnet werden und macht bestimmte Willenserklärungen von der Einwilligung des Betreuers abhängig","Er entsteht automatisch mit jeder Betreuung","Er ersetzt die Betreuung","Er gilt nur für ärztliche Maßnahmen","Der Einwilligungsvorbehalt ist keine Folge der Betreuung, sondern wird vom Gericht gesondert angeordnet."],
+[1,"Woran orientiert sich der Betreuer nach § 1821 Abs. 2 BGB bei seiner Tätigkeit?","An den Wünschen des Betreuten, damit dieser sein Leben nach seinen Vorstellungen gestalten kann","Am objektiven Wohl des Betreuten nach Einschätzung der Angehörigen","An den Empfehlungen des Betreuungsgerichts","An den Kosten der Maßnahme","Die Wünsche des Betreuten sind der Leitgedanke der Betreuung. Sie prägen auch die Gesundheitssorge."],
+[1,"Was ist eine Willenserklärung?","Eine Äußerung, die einen Rechtsbindungswillen erkennen lässt","Jede mündliche Aussage","Nur eine schriftliche Erklärung","Eine Gefälligkeit ohne rechtliche Wirkung","Eine Willenserklärung äußert einen Rechtsbindungswillen. Ein Vertrag entsteht durch übereinstimmende Willenserklärungen (Angebot und Annahme)."],
+[2,"Welche Vorschriften regeln den Behandlungsvertrag im BGB?","§§ 630a bis 630h","§§ 1821 bis 1834","§§ 104 bis 113","§§ 823 bis 830","Der Behandlungsvertrag ist seit 2013 in den §§ 630a bis 630h BGB geregelt."],
+[2,"Nach welchem Maßstab hat die Behandlung grundsätzlich zu erfolgen (§ 630a Abs. 2 BGB)?","Nach den allgemein anerkannten fachlichen Standards zum Zeitpunkt der Behandlung","Nach dem Wunsch des Patienten, auch gegen den Standard","Nach dem günstigsten Preis","Nach dem Standard des Jahres 2000","Der Standard ist der zum Zeitpunkt der Behandlung bestehende, allgemein anerkannte fachliche Standard, soweit nichts anderes vereinbart ist."],
+[2,"Wie lange ist die Patientenakte aufzubewahren (§ 630f BGB)?","Zehn Jahre nach Abschluss der Behandlung, soweit keine andere Vorschrift gilt","Ein Jahr","Fünf Jahre","Drei Jahre","§ 630f Abs. 3 BGB verlangt zehn Jahre Aufbewahrung nach Abschluss der Behandlung, soweit nicht andere Vorschriften längere Fristen vorsehen."],
+[2,"Wer trägt im Streitfall die Beweislast dafür, dass eine Einwilligung und eine ordnungsgemäße Aufklärung vorlagen?","Der Behandelnde","Der Patient","Der Betreuer","Das Betreuungsgericht","§ 630h Abs. 2 BGB: Der Behandelnde hat zu beweisen, dass er eingeholt und aufgeklärt hat."],
+[2,"Was gilt nach § 630g BGB für die Einsicht in die Patientenakte?","Der Patient kann unverzüglich Einsicht in die vollständige Akte verlangen, die erste Abschrift ist unentgeltlich","Nur Ärzte dürfen die Akte einsehen","Einsicht nur nach Gerichtsbeschluss","Einsicht nur in Teile der Akte nach Ermessen des Arztes","Das Einsichtsrecht ist weit gefasst, Ausnahmen gibt es nur bei erheblichen therapeutischen Gründen oder Rechten Dritter."],
+[2,"Worüber muss der Behandelnde nach § 630c BGB auch ohne Nachfrage informieren, wenn er Anhaltspunkte hat?","Über Umstände, die die Annahme eines Behandlungsfehlers begründen, wenn dies zur Abwendung gesundheitlicher Gefahren erforderlich ist","Über die Privatadresse anderer Patienten","Über die Gewinne der Praxis","Über alle Preise von Medikamenten","Der Behandelnde muss auf Nachfrage oder zur Abwendung gesundheitlicher Gefahren über einen Behandlungsfehler informieren (§ 630c Abs. 2)."],
+[2,"Wann kann eine ärztliche Maßnahme nach § 630d Abs. 1 BGB ohne Einwilligung durchgeführt werden?","Wenn sie unaufschiebbar ist, die Einwilligung nicht rechtzeitig eingeholt werden kann und die Maßnahme dem mutmaßlichen Willen entspricht","Immer, wenn der Arzt sie für sinnvoll hält","Wenn der Patient älter als 65 ist","Wenn die Krankenkasse es verlangt","Nur bei Unaufschiebbarkeit und Übereinstimmung mit dem mutmaßlichen Willen entfällt die vorherige Einwilligung."],
+[3,"Wer entscheidet über eine ärztliche Maßnahme, wenn der Betreute für diese Maßnahme einwilligungsfähig ist?","Der Betreute selbst","Der Betreuer","Das Betreuungsgericht","Der behandelnde Arzt","Ein einwilligungsfähiger Patient entscheidet stets selbst. Der Betreuer willigt nur ersatzweise bei Einwilligungsunfähigkeit ein."],
+[3,"Wie wird die Einwilligungsfähigkeit beurteilt?","Für die konkrete Maßnahme, nicht allgemein","Einmal pauschal für alle Lebensbereiche","Nach dem Alter","Nach der Höhe des Pflegegrads","Einwilligungsfähigkeit ist maßnahmenbezogen und nicht mit der Geschäftsfähigkeit identisch."],
+[3,"Welche Fähigkeit meint die Einwilligungsfähigkeit?","Die natürliche Einsichtsfähigkeit in Tragweite und Risiken einer Entscheidung und das Handeln danach","Die Fähigkeit, Verträge über Vermögen zu schließen","Die Fähigkeit, ein Testament zu errichten","Die Fähigkeit, vor Gericht aufzutreten","Es geht um natürliche Einsichts- und Steuerungsfähigkeit für die konkrete Behandlung."],
+[3,"Warum ist die Einwilligung ärztlich so zentral?","Ein Eingriff erfüllt den Tatbestand der Körperverletzung (§ 223 StGB) und wird erst durch wirksame Einwilligung gerechtfertigt","Weil sie die Behandlung billiger macht","Weil sie nur Formalie ist","Weil sie die Haftung des Arztes immer ausschließt","Ohne wirksame Einwilligung droht strafrechtliche und zivilrechtliche Haftung."],
+[3,"Wie kann eine Einwilligung widerrufen werden (§ 630d Abs. 3 BGB)?","Jederzeit, ohne Angabe von Gründen und formlos","Nur schriftlich innerhalb von zwei Wochen","Nur mit Genehmigung des Gerichts","Nur durch den Arzt","Der Widerruf ist jederzeit und formlos möglich."],
+[3,"Wann ist die Einwilligung nach § 630d Abs. 2 BGB nur wirksam?","Wenn der Patient oder der Berechtigte vor der Einwilligung aufgeklärt wurde","Wenn sie schriftlich erfolgt","Wenn ein Zeuge anwesend ist","Wenn sie gerichtlich beglaubigt wurde","Wirksam ist die Einwilligung nur nach Aufklärung nach § 630e Abs. 1 bis 4."],
+[3,"Wann ist eine Aufklärung nach § 630e Abs. 3 BGB entbehrlich?","Wenn die Maßnahme unaufschiebbar ist oder der Patient ausdrücklich verzichtet hat","Wenn der Arzt es eilig hat","Wenn die Maßnahme ungefährlich scheint","Wenn der Patient nichts fragt","Entbehrlich ist sie nur bei Unaufschiebbarkeit oder ausdrücklichem Verzicht."],
+[3,"Wer wird aufgeklärt, wenn der Patient einwilligungsunfähig ist?","Der zur Einwilligung Berechtigte, der Patient wird entsprechend seinem Verständnis einbezogen","Nur der Hausarzt","Nur Angehörige","Niemand","§ 630e Abs. 4 und 5 BGB: Aufklärung des Berechtigten, Einbeziehung des Patienten."],
+[4,"Wann braucht die Einwilligung des Betreuers in eine ärztliche Maßnahme nach § 1829 Abs. 1 BGB die gerichtliche Genehmigung?","Bei begründeter Gefahr, dass der Betreute stirbt oder einen schweren und länger dauernden gesundheitlichen Schaden erleidet","Bei jeder Untersuchung","Nur bei Kosten über 500 Euro","Nur bei Operationen im Ausland","Genehmigungsbedürftig sind Maßnahmen mit begründeter Gefahr von Tod oder schwerem, länger dauerndem Schaden."],
+[4,"Wann braucht die Nichteinwilligung oder der Widerruf nach § 1829 Abs. 2 BGB die Genehmigung?","Wenn die Maßnahme medizinisch angezeigt ist und durch Unterbleiben oder Abbruch die begründete Gefahr von Tod oder schwerem Schaden besteht","Immer, wenn der Betreuer etwas ablehnt","Nur bei Medikamenten","Nie","Auch die Ablehnung einer angezeigten Maßnahme kann genehmigungsbedürftig sein."],
+[4,"Wann ist die Genehmigung nach § 1829 Abs. 3 BGB zu erteilen?","Wenn die Entscheidung dem Willen des Betreuten entspricht","Wenn der Arzt zustimmt","Wenn Angehörige zustimmen","Wenn Kosten gespart werden","Maßstab des Gerichts ist der Wille des Betreuten."],
+[4,"Wann ist nach § 1829 Abs. 4 BGB keine Genehmigung erforderlich?","Wenn Betreuer und behandelnder Arzt Einvernehmen darüber haben, dass die Entscheidung dem nach § 1827 festgestellten Willen entspricht","Wenn der Betreuer es eilig hat","Wenn Angehörige es wünschen","Wenn die Maßnahme billig ist","Das Einvernehmen von Arzt und Betreuer über den festgestellten Willen ersetzt das Genehmigungsverfahren."],
+[4,"Welche Vollmacht deckt gefährliche Maßnahmen nach § 1829 ab?","Eine schriftliche Vollmacht, die die Maßnahmen ausdrücklich nennt (§ 1820 Abs. 2 Nr. 1)","Jede mündliche Vollmacht","Eine Generalvollmacht ohne Nennung der Maßnahmen","Keine Vollmacht","Ein Bevollmächtigter braucht für diese Entscheidungen eine schriftliche, ausdrückliche Vollmacht."],
+[4,"Was ist nach § 298 Abs. 1 FamFG vor der Genehmigung zwingend?","Die persönliche Anhörung des Betroffenen","Die Anhörung der Nachbarn","Ein Gutachten des Hausarztes","Die Zustimmung der Krankenkasse","Die Genehmigung ist nur nach persönlicher Anhörung zulässig."],
+[4,"Wann ist nach § 298 Abs. 2 FamFG stets ein Verfahrenspfleger zu bestellen?","Wenn Gegenstand die Genehmigung nach § 1829 Abs. 2 BGB ist (Nichteinwilligung oder Widerruf)","Bei jeder Betreuung","Nie","Nur bei Minderjährigen","Bei Verfahren über Nichteinwilligung oder Widerruf ist der Verfahrenspfleger zwingend."],
+[4,"Wer soll das Sachverständigengutachten nach § 298 Abs. 3 FamFG nicht erstellen?","Der behandelnde Arzt","Ein Facharzt","Ein unabhängiger Sachverständiger","Ein Arzt mit Erfahrung im Fachgebiet","Der Sachverständige soll nicht der behandelnde Arzt sein."],
+[4,"Wie ist die Rechtslage in Eilfällen bei § 1829 Abs. 1 BGB?","Die Maßnahme darf ohne Genehmigung erfolgen, wenn mit dem Aufschub Gefahr verbunden ist","Sie darf nie erfolgen","Sie braucht stets einen Gerichtsbeschluss vorher","Sie ist strafbar","Bei Gefahr im Aufschub entfällt die vorherige Genehmigung."],
+[5,"Wer darf in eine Sterilisation nach § 1830 BGB einwilligen?","Ein besonderer Sterilisationsbetreuer, mit Genehmigung des Gerichts","Jeder Betreuer ohne Genehmigung","Der Hausarzt","Die Angehörigen","Es muss ein besonderer Betreuer bestellt sein, außerdem ist die Genehmigung nötig."],
+[5,"Wann darf eine Sterilisation frühestens durchgeführt werden?","Zwei Wochen nach Wirksamwerden der Genehmigung","Sofort","Nach einem Jahr","Nach der Volljährigkeit der Geschwister","§ 1830 BGB sieht eine Wartezeit von zwei Wochen nach Wirksamkeit der Genehmigung vor."],
+[5,"Wann ist eine Unterbringung nach § 1831 Abs. 1 Nr. 1 BGB zulässig?","Solange sie wegen der Gefahr der Selbsttötung oder erheblicher Selbstschädigung erforderlich ist","Wenn Angehörige es wünschen","Wenn der Betreute unbequem ist","Wenn die Einrichtung überfüllt ist","Die Gefahr muss auf einer psychischen Krankheit oder Behinderung beruhen, und die Unterbringung muss erforderlich sein."],
+[5,"Was gilt bei Gefahr im Aufschub für die Unterbringung?","Sie darf ohne Genehmigung erfolgen, die Genehmigung ist unverzüglich nachzuholen","Sie ist verboten","Sie braucht keine Genehmigung mehr","Sie braucht nur die Zustimmung des Arztes","§ 1831 Abs. 2 BGB regelt die nachträgliche Genehmigung."],
+[5,"Was ist mit der Unterbringung gleichgestellt (§ 1831 Abs. 4 BGB)?","Freiheitsentziehende Maßnahmen durch mechanische Vorrichtungen, Medikamente oder auf andere Weise über längere Zeit oder regelmäßig","Ein Hausbesuch","Ein Krankenhausbesuch","Ein Spaziergang","Bettgitter, Gurte und Medikamente, die die Fortbewegung einschränken, können genehmigungsbedürftig sein."],
+[5,"Wie viele Voraussetzungen müssen für eine ärztliche Zwangsmaßnahme nach § 1832 Abs. 1 BGB kumulativ vorliegen?","Sieben","Zwei","Drei","Zehn","Alle sieben Voraussetzungen müssen erfüllt sein."],
+[5,"In welchem Rahmen ist eine ärztliche Zwangsmaßnahme zulässig?","Im Rahmen eines stationären Aufenthalts in einem Krankenhaus","Ambulant in der Wohnung","In jeder Einrichtung","Ohne Einschränkung","§ 1832 Abs. 1 Nr. 7 BGB verlangt den stationären Krankenhausaufenthalt mit gebotener Nachbehandlung."],
+[5,"Was muss vor einer Zwangsmaßnahme versucht worden sein?","Ernsthaft, mit dem nötigen Zeitaufwand und ohne unzulässigen Druck den Betreuten von der Notwendigkeit zu überzeugen","Den Betreuten zu überreden, bis er nachgibt","Ihn zu täuschen","Nichts","§ 1832 Abs. 1 Nr. 4 BGB verlangt einen ernsthaften Überzeugungsversuch."],
+[5,"Wie lange darf eine einstweilige Anordnung zur Unterbringung nach § 333 FamFG höchstens dauern?","Sechs Wochen, mit Verlängerung insgesamt höchstens drei Monate","Ein Jahr","Zwei Tage","Zehn Jahre","Bei ärztlicher Zwangsmaßnahme gelten kürzere Fristen: zwei Wochen, insgesamt sechs Wochen."],
+[5,"Was ist Gegenstand der Unterbringungssachen nach § 312 FamFG?","Unterbringung, freiheitsentziehende Maßnahmen und ärztliche Zwangsmaßnahmen sowie Verfahren nach Landesgesetzen","Nur Vermögensangelegenheiten","Nur Mietsachen","Nur Strafsachen","§ 312 FamFG zählt die Verfahren auf, darunter auch die PsychKG-Verfahren."],
+[6,"Welche Stufenfolge gilt bei der Ermittlung des Patientenwillens?","Patientenverfügung, dann Behandlungswünsche, dann mutmaßlicher Wille","Mutmaßlicher Wille, dann Patientenverfügung","Wunsch der Angehörigen, dann Arztmeinung","Allein die Arztmeinung","Die Reihenfolge folgt § 1827 BGB: zuerst Verfügung, dann Wünsche, zuletzt mutmaßlicher Wille."],
+[6,"Welche Anhaltspunkte sind für den mutmaßlichen Willen relevant?","Frühere Äußerungen, ethische oder religiöse Überzeugungen und sonstige Wertvorstellungen","Nur der Wunsch der Erben","Der Kostenfaktor","Die Meinung des Pflegedienstes","§ 1827 Abs. 2 und § 1821 Abs. 4 BGB nennen diese Anhaltspunkte."],
+[6,"Wann muss der Betreuer Wünschen des Betreuten nach § 1821 Abs. 3 BGB nicht entsprechen?","Wenn die Person oder das Vermögen erheblich gefährdet würde und der Betreute die Gefahr wegen Krankheit oder Behinderung nicht erkennen kann, oder wenn es dem Betreuer nicht zuzumuten ist","Immer, wenn er anderer Meinung ist","Wenn der Wunsch ungewöhnlich ist","Wenn es Geld kostet","Beide Elemente der ersten Alternative müssen vorliegen."],
+[6,"Worum geht es im Gespräch nach § 1828 BGB?","Arzt und Betreuer erörtern die indizierte Maßnahme unter Berücksichtigung des Patientenwillens","Um die Vergütung","Um die Kostenübernahme","Um die Dauer der Betreuung","Das Gespräch ist Grundlage der Entscheidung nach § 1827 BGB."],
+[6,"Wer soll Gelegenheit zur Äußerung erhalten, wenn es ohne erhebliche Verzögerung möglich ist (§ 1828 Abs. 2 BGB)?","Nahe Angehörige und sonstige Vertrauenspersonen des Betreuten","Nachbarn","Presse","Mitbewohner ohne Beziehung","Sie können Hinweise zum Willen des Betreuten geben."],
+[7,"Welche Form verlangt § 1827 BGB für eine Patientenverfügung?","Schriftform","Notarielle Beurkundung","Mündlich genügt","Beglaubigung durch das Gericht","Die Patientenverfügung muss schriftlich sein, der Widerruf ist aber formlos möglich."],
+[7,"Welche Fähigkeit muss der Verfasser einer Patientenverfügung haben?","Einwilligungsfähigkeit und Volljährigkeit","Geschäftsfähigkeit nach Vermögensrecht","Prozessfähigkeit","Testierfähigkeit","Entscheidend ist die Einwilligungsfähigkeit zum Zeitpunkt der Errichtung."],
+[7,"Gilt eine Patientenverfügung nur bei unheilbaren Krankheiten?","Nein, sie gilt unabhängig von Art und Stadium der Erkrankung","Ja, nur bei unheilbarer Krankheit","Ja, nur im Endstadium","Ja, nur bei Bewusstlosigkeit","§ 1827 Abs. 3 BGB schließt eine Reichweitenbeschränkung aus."],
+[7,"Was darf nach § 1827 Abs. 5 BGB nicht von der Errichtung einer Patientenverfügung abhängig gemacht werden?","Ein Vertragsschluss, etwa mit einem Pflegeheim","Eine Bestattung","Eine Beratung","Ein Arztgespräch","Errichtung oder Vorlage darf nicht Bedingung eines Vertrags sein."],
+[7,"Wo regelt das Gesetz die Betreuungsverfügung?","§ 1816 Abs. 2 BGB","§ 1827 BGB","§ 1832 BGB","§ 1834 BGB","Betreuungsverfügungen enthalten Wünsche zur Auswahl des Betreuers."],
+[7,"Wie genau muss eine Patientenverfügung nach der Rechtsprechung des BGH sein?","Sie muss erkennen lassen, in welchen Situationen welche Maßnahmen gewollt oder abgelehnt werden","Ein Satz wie „keine lebenserhaltenden Maßnahmen“ genügt","Sie muss nicht konkret sein","Sie muss notariell sein","Die bloße Formel genügt nicht (BGH XII ZB 61/16 und XII ZB 604/15)."],
+[7,"Was unterscheidet die Vorsorgevollmacht von der Betreuungsverfügung?","Die Vollmacht bestimmt einen Stellvertreter, die Betreuungsverfügung enthält Vorschläge an das Gericht","Es gibt keinen Unterschied","Die Vollmacht gilt nur für Ärzte","Die Verfügung ersetzt den Arzt","Bei der Vollmacht wird privat ein Vertreter bestimmt, bei der Betreuungsverfügung bestellt das Gericht."],
+[8,"Wie ist die Tötung auf Verlangen strafrechtlich eingeordnet?","Sie ist nach § 216 StGB strafbar","Sie ist erlaubt","Sie ist nur eine Ordnungswidrigkeit","Sie ist immer straflos","§ 216 StGB stellt die Tötung auf Verlangen unter Strafe."],
+[8,"Wann ist ein Behandlungsabbruch nach dem BGH (2 StR 454/09) gerechtfertigt?","Wenn er dem tatsächlichen oder mutmaßlichen Patientenwillen entspricht und einem zum Tode führenden Krankheitsprozess seinen Lauf lässt","Wenn Angehörige es wünschen","Wenn Kosten zu hoch sind","Wenn der Arzt es für sinnvoll hält","Maßgeblich ist der Patientenwille, nicht die Unterscheidung zwischen Tun und Unterlassen."],
+[8,"Was entschied das Bundesverfassungsgericht am 26.2.2020 zu § 217 StGB?","Die Vorschrift zur geschäftsmäßigen Förderung der Selbsttötung ist nichtig","Sie wurde bestätigt","Sie wurde verschärft","Sie wurde nicht geprüft","Das Gericht erklärte § 217 StGB für nichtig."],
+[8,"Wie geht ein Betreuer zuerst mit einem Sterbewunsch um?","Er nimmt ihn ernst, fragt nach den Hintergründen und eröffnet Hilfen","Er ignoriert ihn","Er erfüllt ihn sofort","Er meldet ihn nur dem Gericht","Hinter einem Sterbewunsch stehen oft Schmerz, Angst, Einsamkeit oder Depression."],
+[8,"Welche Hilfsangebote kommen am Lebensende in Betracht?","Palliativversorgung, Hospiz und Seelsorge","Nur Krankenhaus","Nur Pflegeheim","Keine","Palliative und hospizliche Angebote sowie Seelsorge unterstützen am Lebensende."],
+[9,"Wie viele Phasen unterscheidet das Sterbephasenmodell nach Kübler-Ross?","Fünf","Drei","Sieben","Zehn","Es sind fünf Phasen: Nicht-wahrhaben-Wollen, Zorn, Verhandeln, Depression, Annahme."],
+[9,"Was kennzeichnet die erste Phase?","Nicht-wahrhaben-Wollen: der Befund wird nicht verkraftet","Zorn","Verhandeln","Annahme","Typisch ist das Ausweichen vor dem Ernst der Lage."],
+[9,"Wie reagiert man hilfreich auf Zorn in der zweiten Phase?","Zorn tolerieren, nicht persönlich nehmen und zugewandt bleiben","Mit Gegenvorwürfen","Mit Rückzug","Mit Ablenkung durch Witze","Zorn ist Ausdruck von Hilflosigkeit, kein persönlicher Angriff."],
+[9,"Was kennzeichnet die Phase des Verhandelns?","Das Unvermeidliche wird durch eine Art Handel hinausgeschoben, das Informationsbedürfnis ist groß","Völliges Schweigen","Ruhige Annahme","Aggression","Hoffnung zubilligen, ohne Illusionen zu stützen."],
+[9,"Welche zwei Formen der Depression werden in der vierten Phase unterschieden?","Reaktive und vorbereitende Depression","Akute und chronische","Leichte und schwere","Reaktive und aggressive","Reaktiv: Sorge um Angehörige und Ungeregeltes; vorbereitend: Schmerz über den Abschied."],
+[9,"Was kennzeichnet die Phase der Annahme?","Der Tod wird als Konsequenz des Lebens angenommen, ohne ihn freudig zu erwarten","Der Tod wird freudig erwartet","Der Tod wird geleugnet","Der Patient ist wütend","Da sein, auch schweigend, ist hilfreich."],
+[9,"Wie ist das Phasenmodell einzuordnen?","Als Orientierung, nicht als starres Schema","Als Gesetz","Als verbindliche Reihenfolge","Als medizinische Diagnose","Phasen können sich überlagern, wiederkehren oder fehlen."],
+[10,"Wann braucht die Kündigung selbst genutzten Wohnraums eine Genehmigung (§ 1833 Abs. 3 BGB)?","Immer, wenn Kündigung, Aufhebung des Mietverhältnisses, Vermietung oder Verfügung über das Grundstück mit der Aufgabe des Wohnraums verbunden ist","Nie","Nur bei Eigentum","Nur bei Untermiete","Der Wohnraum des Betreuten ist besonders geschützt."],
+[10,"Wann darf der Betreuer den Umgang des Betreuten nach § 1834 Abs. 1 BGB mit Wirkung für und gegen Dritte bestimmen?","Wenn der Betreute es wünscht oder eine konkrete Gefährdung nach § 1821 Abs. 3 Nr. 1 droht","Immer","Nie","Wenn Angehörige es wollen","Die Befugnis ist an Wunsch oder konkrete Gefährdung gebunden."],
+[10,"Wer entscheidet bei Streit über Umgang oder Aufenthalt nach § 1834 Abs. 3 BGB?","Das Betreuungsgericht auf Antrag","Der Arzt","Die Polizei","Der Betreuer allein","Das Gericht entscheidet auf Antrag."],
+[11,"Welche Frage steht am Anfang des Prüfschemas für ärztliche Entscheidungen?","Ist die Gesundheitssorge im Aufgabenkreis enthalten oder deckt die Vollmacht die Maßnahme?","Wie hoch sind die Kosten?","Was sagen die Nachbarn?","Wie alt ist der Arzt?","Zuerst klärt man, wer überhaupt entscheiden darf."],
+[11,"Was ist die zweite Prüfstufe im Gesamtschema?","Einwilligungsfähigkeit für die konkrete Maßnahme prüfen","Genehmigung beantragen","Vermögen prüfen","Angehörige anhören","Ein einwilligungsfähiger Betreuter entscheidet selbst."]
+];
+
+const QZ=QZ0.map(q=>[q[0],q[1],q[2],[q[3],q[4],q[5]],q[6]]);
+const CD=[
+[1,"Worum geht es in Modul 5?","Gesundheitssorge im Betreuungsrecht: Behandlungsvertrag, Einwilligung, Genehmigungen, Wünsche, Patientenverfügung und Sterbewunsch."],
+[1,"Wann ist jemand geschäftsunfähig (§ 104 Nr. 2 BGB)?","Bei einem die freie Willensbestimmung ausschließenden Zustand krankhafter Störung der Geistestätigkeit. Betreuung allein genügt nicht."],
+[1,"Was ist ein Einwilligungsvorbehalt (§ 1825 BGB)?","Eine gesondert angeordnete Beschränkung: Bestimmte Willenserklärungen des Betreuten brauchen die Einwilligung des Betreuers."],
+[1,"Leitgedanke des Betreuerhandelns (§ 1821 Abs. 2 BGB)?","Der Betreute soll sein Leben im Rahmen seiner Möglichkeiten nach seinen Wünschen gestalten können."],
+[2,"Wo ist der Behandlungsvertrag geregelt?","In den §§ 630a bis 630h BGB (Patientenrechtegesetz 2013)."],
+[2,"Hauptpflichten im Behandlungsvertrag (§ 630a BGB)?","Behandelnder: Behandlung nach dem anerkannten fachlichen Standard. Patient: vereinbarte Vergütung, soweit nicht ein Dritter zahlt."],
+[2,"Was regelt § 630c BGB?","Mitwirkung der Vertragsparteien und Informationspflichten, auch über Behandlungsfehler und Kosten in Textform."],
+[2,"Was regelt § 630d BGB?","Einwilligung: vor jeder Maßnahme, wirksam nur nach Aufklärung, jederzeit formlos widerrufbar."],
+[2,"Was regelt § 630e BGB?","Aufklärung: mündlich, rechtzeitig, verständlich, über Risiken und Alternativen; Unterlagen sind auszuhändigen."],
+[2,"Was regelt § 630f BGB?","Dokumentation: zeitnahe Behandlungsakte, Änderungen nachvollziehbar, Aufbewahrung zehn Jahre."],
+[2,"Was regelt § 630g BGB?","Einsichtnahme in die vollständige Patientenakte; die erste Abschrift ist unentgeltlich."],
+[2,"Was regelt § 630h BGB?","Beweislast: Vermutungen bei voll beherrschbarem Risiko, fehlender Dokumentation, grobem Behandlungsfehler; der Behandelnde beweist Aufklärung und Einwilligung."],
+[3,"Wer entscheidet bei einwilligungsfähigen Betreuten?","Der Betreute selbst."],
+[3,"Wie wird Einwilligungsfähigkeit beurteilt?","Maßnahmenbezogen, als natürliche Einsichts- und Steuerungsfähigkeit. Nicht identisch mit Geschäftsfähigkeit."],
+[3,"Welche vier Teilfähigkeiten prüft man?","Informationen verstehen, ihre Bedeutung für sich einschätzen, abwägen, eine Entscheidung äußern."],
+[3,"Warum braucht jeder ärztliche Eingriff eine Einwilligung?","Er erfüllt den Tatbestand der Körperverletzung (§ 223 StGB); erst die Einwilligung rechtfertigt ihn."],
+[3,"Wann ist die Aufklärung entbehrlich (§ 630e Abs. 3)?","Bei Unaufschiebbarkeit oder ausdrücklichem Verzicht des Patienten."],
+[3,"Wer wird bei Einwilligungsunfähigkeit aufgeklärt?","Der Berechtigte (Betreuer). Der Patient wird entsprechend seinem Verständnis einbezogen (§ 630e Abs. 4 und 5)."],
+[3,"Eilfall nach § 630d Abs. 1 Satz 4?","Unaufschiebbare Maßnahme ohne rechtzeitige Einwilligung: zulässig, wenn sie dem mutmaßlichen Willen entspricht."],
+[4,"§ 1829 Abs. 1 BGB in einem Satz?","Die Einwilligung in eine gefährliche Maßnahme (Gefahr von Tod oder schwerem, länger dauerndem Schaden) braucht die Genehmigung des Gerichts."],
+[4,"§ 1829 Abs. 2 BGB in einem Satz?","Auch Nichteinwilligung und Widerruf einer angezeigten Maßnahme brauchen die Genehmigung, wenn dadurch Lebensgefahr oder schwerer Schaden droht."],
+[4,"Wann ist die Genehmigung zu erteilen (§ 1829 Abs. 3)?","Wenn die Entscheidung dem Willen des Betreuten entspricht."],
+[4,"Wann entfällt die Genehmigung (§ 1829 Abs. 4)?","Bei Einvernehmen zwischen Betreuer und Arzt, dass die Entscheidung dem festgestellten Willen entspricht."],
+[4,"Welche Bedingungen gelten für Bevollmächtigte (§ 1829 Abs. 5, § 1820 Abs. 2)?","Schriftliche Vollmacht, die die Maßnahmen ausdrücklich nennt."],
+[4,"Was verlangt § 298 FamFG?","Persönliche Anhörung, bei Abs. 2-Fällen einen Verfahrenspfleger und ein Gutachten eines Sachverständigen, der nicht der behandelnde Arzt ist."],
+[5,"Wer willigt in eine Sterilisation ein?","Ein besonderer Sterilisationsbetreuer, mit Genehmigung des Gerichts; Durchführung frühestens zwei Wochen nach Wirksamkeit (§ 1830)."],
+[5,"Wann ist eine Unterbringung zulässig (§ 1831 Abs. 1)?","Bei Selbsttötungs- oder erheblicher Selbstschädigungsgefahr oder zur notwendigen Heilbehandlung bei fehlender Einsicht, solange erforderlich."],
+[5,"Was gilt bei Gefahr im Aufschub (§ 1831 Abs. 2)?","Unterbringung ohne vorherige Genehmigung; Genehmigung unverzüglich nachholen."],
+[5,"Pflicht des Betreuers bei Wegfall der Voraussetzungen (§ 1831 Abs. 3)?","Unterbringung beenden und dem Gericht anzeigen."],
+[5,"Was ist mit Unterbringung gleichgestellt (§ 1831 Abs. 4)?","Freiheitsentziehende Maßnahmen über längere Zeit oder regelmäßig (mechanisch, Medikamente, andere)."],
+[5,"Was ist eine ärztliche Zwangsmaßnahme?","Behandlung gegen den natürlichen Willen. Zulässig nur bei Erfüllung aller sieben Voraussetzungen des § 1832 Abs. 1."],
+[5,"Voraussetzungen § 1832 (Merkhilfe)?","Notwendigkeit, fehlende Einsicht, Wille, Überzeugungsversuch, mildestes Mittel, Nutzen überwiegt deutlich, stationär im Krankenhaus."],
+[5,"Fristen einstweiliger Anordnung (§ 333 FamFG)?","Unterbringung: 6 Wochen, insgesamt 3 Monate. Zwangsmaßnahme: 2 Wochen, insgesamt 6 Wochen."],
+[5,"Was ist PsychKG-Unterbringung?","Öffentlich-rechtliche Unterbringung nach Landesrecht zur Gefahrenabwehr; Verfahren nach § 312 FamFG."],
+[6,"Stufenfolge der Willensermittlung?","1. Patientenverfügung, 2. Behandlungswünsche, 3. mutmaßlicher Wille (§ 1827 BGB)."],
+[6,"Anhaltspunkte für den mutmaßlichen Willen?","Frühere Äußerungen, ethische und religiöse Überzeugungen, sonstige Wertvorstellungen; Angehörige und Vertrauenspersonen anhören."],
+[6,"Wann sind Wünsche nicht zu befolgen (§ 1821 Abs. 3)?","Bei erheblicher Gefährdung von Person oder Vermögen, die der Betreute krankheitsbedingt nicht erkennt, oder wenn es dem Betreuer nicht zuzumuten ist."],
+[6,"Was regelt § 1828 BGB?","Das Gespräch zwischen Arzt und Betreuer über die indizierte Maßnahme und den Patientenwillen."],
+[6,"Was verlangt § 1821 Abs. 5?","Persönlicher Kontakt, regelmäßiger persönlicher Eindruck, Besprechung der Angelegenheiten mit dem Betreuten."],
+[7,"Was ist eine Patientenverfügung?","Schriftliche Festlegung eines einwilligungsfähigen Volljährigen, in welche Maßnahmen er einwilligt oder sie untersagt (§ 1827 Abs. 1)."],
+[7,"Was prüft der Betreuer bei einer Patientenverfügung?","Ob die Festlegungen auf die aktuelle Lebens- und Behandlungssituation zutreffen; dann verschafft er dem Willen Geltung."],
+[7,"Gilt eine Patientenverfügung nur in bestimmten Krankheitsstadien?","Nein, unabhängig von Art und Stadium der Erkrankung (§ 1827 Abs. 3)."],
+[7,"Wie wird eine Patientenverfügung widerrufen?","Jederzeit formlos."],
+[7,"Was darf nicht von einer Patientenverfügung abhängen?","Ein Vertragsschluss (zum Beispiel mit einem Heim); niemand muss sie errichten (§ 1827 Abs. 5)."],
+[7,"Was ist eine Vorsorgevollmacht?","Bestimmung eines Stellvertreters für festgelegte Aufgabenbereiche (§ 1820 BGB)."],
+[7,"Was ist eine Betreuungsverfügung?","Dokument mit Wünschen zur Auswahl des Betreuers und zur Betreuung, das dem Gericht zu übermitteln ist (§ 1816 Abs. 2)."],
+[7,"BGH zur Bestimmtheit der Patientenverfügung?","Konkrete Situationen und Maßnahmen müssen erkennbar sein; die Formel „keine lebenserhaltenden Maßnahmen“ allein genügt nicht."],
+[8,"Rechtslage der Tötung auf Verlangen?","Strafbar nach § 216 StGB."],
+[8,"Was erlaubt die BGH-Entscheidung 2 StR 454/09?","Behandlungsabbruch bei tatsächlichem oder mutmaßlichem Patientenwillen, wenn er einem tödlichen Krankheitsprozess seinen Lauf lässt."],
+[8,"Was ist indirekte Sterbehilfe?","Schmerzlinderung mit in Kauf genommener Lebensverkürzung; zulässig bei entsprechendem Willen."],
+[8,"BVerfG am 26.2.2020?","§ 217 StGB (geschäftsmäßige Förderung der Selbsttötung) ist nichtig."],
+[8,"Erster Schritt bei Sterbewunsch?","Ernst nehmen, nachfragen, Hintergründe verstehen (Schmerz, Angst, Einsamkeit, Depression) und Hilfen eröffnen."],
+[8,"Welche Hilfen gibt es am Lebensende?","Palliativversorgung (SAPV, § 37b SGB V), Hospiz (§ 39a SGB V), Seelsorge, Telefonseelsorge 0800 111 0 111."],
+[9,"Fünf Sterbephasen (Kübler-Ross)?","Nicht-wahrhaben-Wollen, Zorn, Verhandeln, Depression, Annahme."],
+[9,"Hilfreich bei Zorn?","Zorn tolerieren, nicht persönlich nehmen, zugewandt bleiben."],
+[9,"Hilfreich beim Verhandeln?","Hoffnung zubilligen, Illusionen nicht stützen, informieren, einbeziehen, Seelsorge anbieten."],
+[9,"Zwei Depressionsformen?","Reaktiv (Sorge um Angehörige und Ungeregeltes) und vorbereitend (Schmerz über den Abschied)."],
+[9,"Hilfreich bei Annahme?","Da sein, auch schweigend; kleine Zuwendungen."],
+[10,"Wohnraum aufgeben: Pflicht des Betreuers (§ 1833 Abs. 2)?","Unverzüglich dem Gericht anzeigen, mit Gründen und Sicht des Betreuten."],
+[10,"Genehmigung bei Wohnraum (§ 1833 Abs. 3)?","Kündigung, Aufhebung, Vermietung und Grundstücksverfügung bei Wohnungsaufgabe."],
+[10,"Umgang bestimmen (§ 1834 Abs. 1)?","Nur auf Wunsch des Betreuten oder bei konkreter Gefährdung nach § 1821 Abs. 3 Nr. 1."],
+[11,"Erste Prüffrage bei ärztlichen Entscheidungen?","Gesundheitssorge im Aufgabenkreis oder Vollmacht, die die Maßnahme umfasst?"],
+[11,"Zweite Prüffrage?","Einwilligungsfähigkeit für die konkrete Maßnahme? Wenn ja, entscheidet der Betreute."],
+[11,"Letzte Prüffrage?","Entscheidung erklären, dokumentieren und Beendigung prüfen, wenn Voraussetzungen wegfallen."]
+];
+
+const LAW=[{"id": "bgb630a", "g": "BGB", "n": "§ 630a BGB", "t": "Vertragstypische Pflichten beim Behandlungsvertrag", "x": ["(1) Durch den Behandlungsvertrag wird derjenige, welcher die medizinische Behandlung eines Patienten zusagt (Behandelnder), zur Leistung der versprochenen Behandlung, der andere Teil (Patient) zur Gewährung der vereinbarten Vergütung verpflichtet, soweit nicht ein Dritter zur Zahlung verpflichtet ist.", "(2) Die Behandlung hat nach den zum Zeitpunkt der Behandlung bestehenden, allgemein anerkannten fachlichen Standards zu erfolgen, soweit nicht etwas anderes vereinbart ist."], "u": "https://www.gesetze-im-internet.de/bgb/__630a.html"}, {"id": "bgb630b", "g": "BGB", "n": "§ 630b BGB", "t": "Anwendbare Vorschriften", "x": ["Auf das Behandlungsverhältnis sind die Vorschriften über das Dienstverhältnis, das kein Arbeitsverhältnis im Sinne des § 622 ist, anzuwenden, soweit nicht in diesem Untertitel etwas anderes bestimmt ist."], "u": "https://www.gesetze-im-internet.de/bgb/__630b.html"}, {"id": "bgb630c", "g": "BGB", "n": "§ 630c BGB", "t": "Mitwirkung der Vertragsparteien; Informationspflichten", "x": ["(1) Behandelnder und Patient sollen zur Durchführung der Behandlung zusammenwirken.", "(2) Der Behandelnde ist verpflichtet, dem Patienten in verständlicher Weise zu Beginn der Behandlung und, soweit erforderlich, in deren Verlauf sämtliche für die Behandlung wesentlichen Umstände zu erläutern, insbesondere die Diagnose, die voraussichtliche gesundheitliche Entwicklung, die Therapie und die zu und nach der Therapie zu ergreifenden Maßnahmen. Sind für den Behandelnden Umstände erkennbar, die die Annahme eines Behandlungsfehlers begründen, hat er den Patienten über diese auf Nachfrage oder zur Abwendung gesundheitlicher Gefahren zu informieren. Ist dem Behandelnden oder einem seiner in § 52 Absatz 1 der Strafprozessordnung bezeichneten Angehörigen ein Behandlungsfehler unterlaufen, darf die Information nach Satz 2 zu Beweiszwecken in einem gegen den Behandelnden oder gegen seinen Angehörigen geführten Straf- oder Bußgeldverfahren nur mit Zustimmung des Behandelnden verwendet werden.", "(3) Weiß der Behandelnde, dass eine vollständige Übernahme der Behandlungskosten durch einen Dritten nicht gesichert ist oder ergeben sich nach den Umständen hierfür hinreichende Anhaltspunkte, muss er den Patienten vor Beginn der Behandlung über die voraussichtlichen Kosten der Behandlung in Textform informieren. Weitergehende Formanforderungen aus anderen Vorschriften bleiben unberührt.", "(4) Der Information des Patienten bedarf es nicht, soweit diese ausnahmsweise aufgrund besonderer Umstände entbehrlich ist, insbesondere wenn die Behandlung unaufschiebbar ist oder der Patient auf die Information ausdrücklich verzichtet hat."], "u": "https://www.gesetze-im-internet.de/bgb/__630c.html"}, {"id": "bgb630d", "g": "BGB", "n": "§ 630d BGB", "t": "Einwilligung", "x": ["(1) Vor Durchführung einer medizinischen Maßnahme, insbesondere eines Eingriffs in den Körper oder die Gesundheit, ist der Behandelnde verpflichtet, die Einwilligung des Patienten einzuholen. Ist der Patient einwilligungsunfähig, ist die Einwilligung eines hierzu Berechtigten einzuholen, soweit nicht eine Patientenverfügung nach § 1827 Absatz 1 Satz 1 die Maßnahme gestattet oder untersagt. Weitergehende Anforderungen an die Einwilligung aus anderen Vorschriften bleiben unberührt. Kann eine Einwilligung für eine unaufschiebbare Maßnahme nicht rechtzeitig eingeholt werden, darf sie ohne Einwilligung durchgeführt werden, wenn sie dem mutmaßlichen Willen des Patienten entspricht.", "(2) Die Wirksamkeit der Einwilligung setzt voraus, dass der Patient oder im Fall des Absatzes 1 Satz 2 der zur Einwilligung Berechtigte vor der Einwilligung nach Maßgabe von § 630e Absatz 1 bis 4 aufgeklärt worden ist.", "(3) Die Einwilligung kann jederzeit und ohne Angabe von Gründen formlos widerrufen werden."], "u": "https://www.gesetze-im-internet.de/bgb/__630d.html"}, {"id": "bgb630e", "g": "BGB", "n": "§ 630e BGB", "t": "Aufklärungspflichten", "x": ["(1) Der Behandelnde ist verpflichtet, den Patienten über sämtliche für die Einwilligung wesentlichen Umstände aufzuklären. Dazu gehören insbesondere Art, Umfang, Durchführung, zu erwartende Folgen und Risiken der Maßnahme sowie ihre Notwendigkeit, Dringlichkeit, Eignung und Erfolgsaussichten im Hinblick auf die Diagnose oder die Therapie. Bei der Aufklärung ist auch auf Alternativen zur Maßnahme hinzuweisen, wenn mehrere medizinisch gleichermaßen indizierte und übliche Methoden zu wesentlich unterschiedlichen Belastungen, Risiken oder Heilungschancen führen können.", "(2) Die Aufklärung muss 1. mündlich durch den Behandelnden oder durch eine Person erfolgen, die über die zur Durchführung der Maßnahme notwendige Ausbildung verfügt; ergänzend kann auch auf Unterlagen Bezug genommen werden, die der Patient in Textform erhält,", "2. so rechtzeitig erfolgen, dass der Patient seine Entscheidung über die Einwilligung wohlüberlegt treffen kann,", "3. für den Patienten verständlich sein.", "Dem Patienten sind Abschriften von Unterlagen, die er im Zusammenhang mit der Aufklärung oder Einwilligung unterzeichnet hat, auszuhändigen.", "(3) Der Aufklärung des Patienten bedarf es nicht, soweit diese ausnahmsweise aufgrund besonderer Umstände entbehrlich ist, insbesondere wenn die Maßnahme unaufschiebbar ist oder der Patient auf die Aufklärung ausdrücklich verzichtet hat.", "(4) Ist nach § 630d Absatz 1 Satz 2 die Einwilligung eines hierzu Berechtigten einzuholen, ist dieser nach Maßgabe der Absätze 1 bis 3 aufzuklären.", "(5) Im Fall des § 630d Absatz 1 Satz 2 sind die wesentlichen Umstände nach Absatz 1 auch dem Patienten entsprechend seinem Verständnis zu erläutern, soweit dieser aufgrund seines Entwicklungsstandes und seiner Verständnismöglichkeiten in der Lage ist, die Erläuterung aufzunehmen, und soweit dies seinem Wohl nicht zuwiderläuft. Absatz 3 gilt entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__630e.html"}, {"id": "bgb630f", "g": "BGB", "n": "§ 630f BGB", "t": "Dokumentation der Behandlung", "x": ["(1) Der Behandelnde ist verpflichtet, zum Zweck der Dokumentation in unmittelbarem zeitlichen Zusammenhang mit der Behandlung eine Behandlungsakte in Papierform oder elektronisch zu führen. Berichtigungen und Änderungen von Eintragungen in der Behandlungsakte sind nur zulässig, wenn neben dem ursprünglichen Inhalt erkennbar bleibt, wann sie vorgenommen worden sind. Dies ist auch für elektronisch geführte Behandlungsakten sicherzustellen.", "(2) Der Behandelnde ist verpflichtet, in der Behandlungsakte sämtliche aus fachlicher Sicht für die derzeitige und künftige Behandlung wesentlichen Maßnahmen und deren Ergebnisse aufzuzeichnen, insbesondere die Anamnese, Diagnosen, Untersuchungen, Untersuchungsergebnisse, Befunde, Therapien und ihre Wirkungen, Eingriffe und ihre Wirkungen, Einwilligungen und Aufklärungen. Arztbriefe sind in die Behandlungsakte aufzunehmen.", "(3) Der Behandelnde hat die Behandlungsakte für die Dauer von zehn Jahren nach Abschluss der Behandlung aufzubewahren, soweit nicht nach anderen Vorschriften andere Aufbewahrungsfristen bestehen."], "u": "https://www.gesetze-im-internet.de/bgb/__630f.html"}, {"id": "bgb630g", "g": "BGB", "n": "§ 630g BGB", "t": "Einsichtnahme in die Behandlungsakte", "x": ["(1) Dem Patienten ist auf Verlangen unverzüglich Einsicht in die vollständige, ihn betreffende Behandlungsakte zu gewähren. § 811 ist entsprechend anzuwenden. Der Patient kann auch Abschriften von der Behandlungsakte, einschließlich elektronischer Abschriften, verlangen. Die erste Abschrift wird unentgeltlich zur Verfügung gestellt.", "(2) Das Recht nach Absatz 1 besteht nicht, soweit erhebliche therapeutische Gründe oder sonstige erhebliche Rechte Dritter entgegenstehen. Die Ablehnung der Einsichtnahme ist zu begründen.", "(3) Im Fall des Todes des Patienten stehen die Rechte nach Absatz 1 zur Wahrnehmung der vermögensrechtlichen Interessen seinen Erben mit der Maßgabe zu, dass die Erben die entstandenen Kosten zu erstatten haben. Gleiches gilt für die nächsten Angehörigen des Patienten, soweit sie immaterielle Interessen geltend machen. Die Rechte sind ausgeschlossen, soweit der Einsichtnahme der ausdrückliche oder mutmaßliche Wille des Patienten entgegensteht.", "(4) Datenschutzrechtliche Rechte des Betroffenen bleiben von den Absätzen 1 bis 3 unberührt, soweit in diesem Absatz nichts anderes geregelt ist. Soweit datenschutzrechtliche Auskunftsansprüche und Informationspflichten unentgeltlich zu erfüllen sind, steht dies Entgelten für Einsichtnahmen nach Absatz 1 entgegen. Der Ausschluss des Einsichtsrechts nach Absatz 2 steht im Verhältnis zwischen Behandelndem und Patienten auch datenschutzrechtlichen Auskunftsansprüchen und Informationspflichten entgegen."], "u": "https://www.gesetze-im-internet.de/bgb/__630g.html"}, {"id": "bgb630h", "g": "BGB", "n": "§ 630h BGB", "t": "Beweislast bei Haftung für Behandlungs- und Aufklärungsfehler", "x": ["(1) Ein Fehler des Behandelnden wird vermutet, wenn sich ein allgemeines Behandlungsrisiko verwirklicht hat, das für den Behandelnden voll beherrschbar war und das zur Verletzung des Lebens, des Körpers oder der Gesundheit des Patienten geführt hat.", "(2) Der Behandelnde hat zu beweisen, dass er eine Einwilligung gemäß § 630d eingeholt und entsprechend den Anforderungen des § 630e aufgeklärt hat. Genügt die Aufklärung nicht den Anforderungen des § 630e, kann der Behandelnde sich darauf berufen, dass der Patient auch im Fall einer ordnungsgemäßen Aufklärung in die Maßnahme eingewilligt hätte.", "(3) Hat der Behandelnde eine medizinisch gebotene wesentliche Maßnahme und ihr Ergebnis entgegen § 630f Absatz 1 oder Absatz 2 nicht in der Behandlungsakte aufgezeichnet oder hat er die Behandlungsakte entgegen § 630f Absatz 3 nicht aufbewahrt, wird vermutet, dass er diese Maßnahme nicht getroffen hat.", "(4) War ein Behandelnder für die von ihm vorgenommene Behandlung nicht befähigt, wird vermutet, dass die mangelnde Befähigung für den Eintritt der Verletzung des Lebens, des Körpers oder der Gesundheit ursächlich war.", "(5) Liegt ein grober Behandlungsfehler vor und ist dieser grundsätzlich geeignet, eine Verletzung des Lebens, des Körpers oder der Gesundheit der tatsächlich eingetretenen Art herbeizuführen, wird vermutet, dass der Behandlungsfehler für diese Verletzung ursächlich war. Dies gilt auch dann, wenn es der Behandelnde unterlassen hat, einen medizinisch gebotenen Befund rechtzeitig zu erheben oder zu sichern, soweit der Befund mit hinreichender Wahrscheinlichkeit ein Ergebnis erbracht hätte, das Anlass zu weiteren Maßnahmen gegeben hätte, und wenn das Unterlassen solcher Maßnahmen grob fehlerhaft gewesen wäre."], "u": "https://www.gesetze-im-internet.de/bgb/__630h.html"}, {"id": "bgb1820", "g": "BGB", "n": "§ 1820 BGB", "t": "Vorsorgevollmacht und Kontrollbetreuung", "x": ["(1) Wer von der Einleitung eines Verfahrens über die Bestellung eines Betreuers für einen Volljährigen Kenntnis erlangt und ein Dokument besitzt, in dem der Volljährige eine andere Person mit der Wahrnehmung seiner Angelegenheiten bevollmächtigt hat, hat das Betreuungsgericht hierüber unverzüglich zu unterrichten. Das Betreuungsgericht kann die Vorlage einer Abschrift verlangen.", "(2) Folgende Maßnahmen eines Bevollmächtigten setzen voraus, dass die Vollmacht schriftlich erteilt ist und diese Maßnahmen ausdrücklich umfasst: 1. die Einwilligung sowie ihr Widerruf oder die Nichteinwilligung in Maßnahmen nach § 1829 Absatz 1 Satz 1 und Absatz 2,", "2. die Unterbringung nach § 1831 und die Einwilligung in Maßnahmen nach § 1831 Absatz 4,", "3. die Einwilligung in eine ärztliche Zwangsmaßnahme nach § 1832 und die Verbringung nach § 1832 Absatz 4.", "(3) Das Betreuungsgericht bestellt einen Kontrollbetreuer, wenn die Bestellung erforderlich ist, weil 1. der Vollmachtgeber aufgrund einer Krankheit oder Behinderung nicht mehr in der Lage ist, seine Rechte gegenüber dem Bevollmächtigten auszuüben, und", "2. aufgrund konkreter Anhaltspunkte davon auszugehen ist, dass der Bevollmächtigte die Angelegenheiten des Vollmachtgebers nicht entsprechend der Vereinbarung oder dem erklärten oder mutmaßlichen Willen des Vollmachtgebers besorgt.", "(4) Das Betreuungsgericht kann anordnen, dass der Bevollmächtigte die ihm erteilte Vollmacht nicht ausüben darf und die Vollmachtsurkunde an den Betreuer herauszugeben hat, wenn 1. die dringende Gefahr besteht, dass der Bevollmächtigte nicht den Wünschen des Vollmachtgebers entsprechend handelt und dadurch die Person des Vollmachtgebers oder dessen Vermögen erheblich gefährdet oder", "2. der Bevollmächtigte den Betreuer bei der Wahrnehmung seiner Aufgaben behindert.", "Liegen die Voraussetzungen des Satzes 1 nicht mehr vor, hat das Betreuungsgericht die Anordnung aufzuheben und den Betreuer zu verpflichten, dem Bevollmächtigten die Vollmachtsurkunde herauszugeben, wenn die Vollmacht nicht erloschen ist.", "(5) Der Betreuer darf eine Vollmacht oder einen Teil einer Vollmacht, die den Bevollmächtigten zu Maßnahmen der Personensorge oder zu Maßnahmen in wesentlichen Bereichen der Vermögenssorge ermächtigt, nur widerrufen, wenn das Festhalten an der Vollmacht eine künftige Verletzung der Person oder des Vermögens des Betreuten mit hinreichender Wahrscheinlichkeit und in erheblicher Schwere befürchten lässt und mildere Maßnahmen nicht zur Abwehr eines Schadens für den Betreuten geeignet erscheinen. Der Widerruf bedarf der Genehmigung des Betreuungsgerichts. Mit der Genehmigung des Widerrufs einer Vollmacht kann das Betreuungsgericht die Herausgabe der Vollmachtsurkunde an den Betreuer anordnen."], "u": "https://www.gesetze-im-internet.de/bgb/__1820.html"}, {"id": "bgb1821", "g": "BGB", "n": "§ 1821 BGB", "t": "Pflichten des Betreuers; Wünsche des Betreuten", "x": ["(1) Der Betreuer nimmt alle Tätigkeiten vor, die erforderlich sind, um die Angelegenheiten des Betreuten rechtlich zu besorgen. Er unterstützt den Betreuten dabei, seine Angelegenheiten rechtlich selbst zu besorgen, und macht von seiner Vertretungsmacht nach § 1823 nur Gebrauch, soweit dies erforderlich ist.", "(2) Der Betreuer hat die Angelegenheiten des Betreuten so zu besorgen, dass dieser im Rahmen seiner Möglichkeiten sein Leben nach seinen Wünschen gestalten kann. Hierzu hat der Betreuer die Wünsche des Betreuten festzustellen. Diesen hat der Betreuer vorbehaltlich des Absatzes 3 zu entsprechen und den Betreuten bei deren Umsetzung rechtlich zu unterstützen. Dies gilt auch für die Wünsche, die der Betreute vor der Bestellung des Betreuers geäußert hat, es sei denn, dass er an diesen Wünschen erkennbar nicht festhalten will.", "(3) Den Wünschen des Betreuten hat der Betreuer nicht zu entsprechen, soweit 1. die Person des Betreuten oder dessen Vermögen hierdurch erheblich gefährdet würde und der Betreute diese Gefahr aufgrund seiner Krankheit oder Behinderung nicht erkennen oder nicht nach dieser Einsicht handeln kann oder", "2. dies dem Betreuer nicht zuzumuten ist.", "(4) Kann der Betreuer die Wünsche des Betreuten nicht feststellen oder darf er ihnen nach Absatz 3 Nummer 1 nicht entsprechen, hat er den mutmaßlichen Willen des Betreuten aufgrund konkreter Anhaltspunkte zu ermitteln und ihm Geltung zu verschaffen. Zu berücksichtigen sind insbesondere frühere Äußerungen, ethische oder religiöse Überzeugungen und sonstige persönliche Wertvorstellungen des Betreuten. Bei der Feststellung des mutmaßlichen Willens soll nahen Angehörigen und sonstigen Vertrauenspersonen des Betreuten Gelegenheit zur Äußerung gegeben werden.", "(5) Der Betreuer hat den erforderlichen persönlichen Kontakt mit dem Betreuten zu halten, sich regelmäßig einen persönlichen Eindruck von ihm zu verschaffen und dessen Angelegenheiten mit ihm zu besprechen.", "(6) Der Betreuer hat innerhalb seines Aufgabenkreises dazu beizutragen, dass Möglichkeiten genutzt werden, die Fähigkeit des Betreuten, seine eigenen Angelegenheiten zu besorgen, wiederherzustellen oder zu verbessern."], "u": "https://www.gesetze-im-internet.de/bgb/__1821.html"}, {"id": "bgb1827", "g": "BGB", "n": "§ 1827 BGB", "t": "Patientenverfügung; Behandlungswünsche oder mutmaßlicher Wille des Betreuten", "x": ["(1) Hat ein einwilligungsfähiger Volljähriger für den Fall seiner Einwilligungsunfähigkeit schriftlich festgelegt, ob er in bestimmte, zum Zeitpunkt der Festlegung noch nicht unmittelbar bevorstehende Untersuchungen seines Gesundheitszustands, Heilbehandlungen oder ärztliche Eingriffe einwilligt oder sie untersagt (Patientenverfügung), prüft der Betreuer, ob diese Festlegungen auf die aktuelle Lebens- und Behandlungssituation des Betreuten zutreffen. Ist dies der Fall, hat der Betreuer dem Willen des Betreuten Ausdruck und Geltung zu verschaffen. Eine Patientenverfügung kann jederzeit formlos widerrufen werden.", "(2) Liegt keine Patientenverfügung vor oder treffen die Festlegungen einer Patientenverfügung nicht auf die aktuelle Lebens- und Behandlungssituation des Betreuten zu, hat der Betreuer die Behandlungswünsche oder den mutmaßlichen Willen des Betreuten festzustellen und auf dieser Grundlage zu entscheiden, ob er in eine ärztliche Maßnahme nach Absatz 1 einwilligt oder sie untersagt. Der mutmaßliche Wille ist aufgrund konkreter Anhaltspunkte zu ermitteln. Zu berücksichtigen sind insbesondere frühere Äußerungen, ethische oder religiöse Überzeugungen und sonstige persönliche Wertvorstellungen des Betreuten.", "(3) Die Absätze 1 und 2 gelten unabhängig von Art und Stadium einer Erkrankung des Betreuten.", "(4) Der Betreuer soll den Betreuten in geeigneten Fällen auf die Möglichkeit einer Patientenverfügung hinweisen und ihn auf dessen Wunsch bei der Errichtung einer Patientenverfügung unterstützen.", "(5) Niemand kann zur Errichtung einer Patientenverfügung verpflichtet werden. Die Errichtung oder Vorlage einer Patientenverfügung darf nicht zur Bedingung eines Vertragsschlusses gemacht werden.", "(6) Die Absätze 1 bis 3 gelten für Bevollmächtigte entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1827.html"}, {"id": "bgb1828", "g": "BGB", "n": "§ 1828 BGB", "t": "Gespräch zur Feststellung des Patientenwillens", "x": ["(1) Der behandelnde Arzt prüft, welche ärztliche Maßnahme im Hinblick auf den Gesamtzustand und die Prognose des Patienten indiziert ist. Er und der Betreuer erörtern diese Maßnahme unter Berücksichtigung des Patientenwillens als Grundlage für die nach § 1827 zu treffende Entscheidung.", "(2) Bei der Feststellung des Patientenwillens nach § 1827 Absatz 1 oder der Behandlungswünsche oder des mutmaßlichen Willens nach § 1827 Absatz 2 soll nahen Angehörigen und sonstigen Vertrauenspersonen des Betreuten Gelegenheit zur Äußerung gegeben werden, sofern dies ohne erhebliche Verzögerung möglich ist.", "(3) Die Absätze 1 und 2 gelten für Bevollmächtigte entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1828.html"}, {"id": "bgb1829", "g": "BGB", "n": "§ 1829 BGB", "t": "Genehmigung des Betreuungsgerichts bei ärztlichen Maßnahmen", "x": ["(1) Die Einwilligung des Betreuers in eine Untersuchung des Gesundheitszustands, eine Heilbehandlung oder einen ärztlichen Eingriff bedarf der Genehmigung des Betreuungsgerichts, wenn die begründete Gefahr besteht, dass der Betreute aufgrund der Maßnahme stirbt oder einen schweren und länger dauernden gesundheitlichen Schaden erleidet. Ohne die Genehmigung darf die Maßnahme nur durchgeführt werden, wenn mit dem Aufschub Gefahr verbunden ist.", "(2) Die Nichteinwilligung oder der Widerruf der Einwilligung des Betreuers in eine Untersuchung des Gesundheitszustands, eine Heilbehandlung oder einen ärztlichen Eingriff bedarf der Genehmigung des Betreuungsgerichts, wenn die Maßnahme medizinisch angezeigt ist und die begründete Gefahr besteht, dass der Betreute aufgrund des Unterbleibens oder des Abbruchs der Maßnahme stirbt oder einen schweren und länger dauernden gesundheitlichen Schaden erleidet.", "(3) Die Genehmigung nach den Absätzen 1 und 2 ist zu erteilen, wenn die Einwilligung, die Nichteinwilligung oder der Widerruf der Einwilligung dem Willen des Betreuten entspricht.", "(4) Eine Genehmigung nach den Absätzen 1 und 2 ist nicht erforderlich, wenn zwischen Betreuer und behandelndem Arzt Einvernehmen darüber besteht, dass die Erteilung, die Nichterteilung oder der Widerruf der Einwilligung dem nach § 1827 festgestellten Willen des Betreuten entspricht.", "(5) Die Absätze 1 bis 4 gelten nach Maßgabe des § 1820 Absatz 2 Nummer 1 für einen Bevollmächtigten entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1829.html"}, {"id": "bgb1830", "g": "BGB", "n": "§ 1830 BGB", "t": "Sterilisation", "x": ["(1) Die Einwilligung eines Sterilisationsbetreuers in eine Sterilisation des Betreuten, in die dieser nicht selbst einwilligen kann, ist nur zulässig, wenn 1. die Sterilisation dem natürlichen Willen des Betreuten entspricht,", "2. der Betreute auf Dauer einwilligungsunfähig bleiben wird,", "3. anzunehmen ist, dass es ohne die Sterilisation zu einer Schwangerschaft kommen würde,", "4. infolge dieser Schwangerschaft eine Gefahr für das Leben oder die Gefahr einer schwerwiegenden Beeinträchtigung des körperlichen oder seelischen Gesundheitszustands der Schwangeren zu erwarten wäre, die nicht auf zumutbare Weise abgewendet werden könnte, und", "5. die Schwangerschaft nicht durch andere zumutbare Mittel verhindert werden kann.", "(2) Die Einwilligung bedarf der Genehmigung des Betreuungsgerichts. Die Sterilisation darf erst zwei Wochen nach Wirksamkeit der Genehmigung durchgeführt werden. Bei der Sterilisation ist stets der Methode der Vorzug zu geben, die eine Refertilisierung zulässt."], "u": "https://www.gesetze-im-internet.de/bgb/__1830.html"}, {"id": "bgb1831", "g": "BGB", "n": "§ 1831 BGB", "t": "Freiheitsentziehende Unterbringung und freiheitsentziehende Maßnahmen", "x": ["(1) Eine Unterbringung des Betreuten durch den Betreuer, die mit Freiheitsentziehung verbunden ist, ist nur zulässig, solange sie erforderlich ist, weil 1. aufgrund einer psychischen Krankheit oder geistigen oder seelischen Behinderung des Betreuten die Gefahr besteht, dass er sich selbst tötet oder erheblichen gesundheitlichen Schaden zufügt, oder", "2. zur Abwendung eines drohenden erheblichen gesundheitlichen Schadens eine Untersuchung des Gesundheitszustands, eine Heilbehandlung oder ein ärztlicher Eingriff notwendig ist, die Maßnahme ohne die Unterbringung des Betreuten nicht durchgeführt werden kann und der Betreute aufgrund einer psychischen Krankheit oder geistigen oder seelischen Behinderung die Notwendigkeit der Unterbringung nicht erkennen oder nicht nach dieser Einsicht handeln kann.", "(2) Die Unterbringung ist nur mit Genehmigung des Betreuungsgerichts zulässig. Ohne die Genehmigung ist die Unterbringung nur zulässig, wenn mit dem Aufschub Gefahr verbunden ist; die Genehmigung ist unverzüglich nachzuholen.", "(3) Der Betreuer hat die Unterbringung zu beenden, wenn ihre Voraussetzungen weggefallen sind. Er hat die Beendigung der Unterbringung dem Betreuungsgericht unverzüglich anzuzeigen.", "(4) Die Absätze 1 bis 3 gelten entsprechend, wenn dem Betreuten, der sich in einem Krankenhaus, einem Heim oder einer sonstigen Einrichtung aufhält, durch mechanische Vorrichtungen, Medikamente oder auf andere Weise über einen längeren Zeitraum oder regelmäßig die Freiheit entzogen werden soll.", "(5) Die Absätze 1 bis 4 gelten nach Maßgabe des § 1820 Absatz 2 Nummer 2 für einen Bevollmächtigten entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1831.html"}, {"id": "bgb1832", "g": "BGB", "n": "§ 1832 BGB", "t": "Ärztliche Zwangsmaßnahmen", "x": ["(1) Widerspricht eine Untersuchung des Gesundheitszustands, eine Heilbehandlung oder ein ärztlicher Eingriff dem natürlichen Willen des Betreuten (ärztliche Zwangsmaßnahme), so kann der Betreuer in die ärztliche Zwangsmaßnahme nur einwilligen, wenn 1. die ärztliche Zwangsmaßnahme notwendig ist, um einen drohenden erheblichen gesundheitlichen Schaden vom Betreuten abzuwenden,", "2. der Betreute aufgrund einer psychischen Krankheit oder einer geistigen oder seelischen Behinderung die Notwendigkeit der ärztlichen Maßnahme nicht erkennen oder nicht nach dieser Einsicht handeln kann,", "3. die ärztliche Zwangsmaßnahme dem nach § 1827 zu beachtenden Willen des Betreuten entspricht,", "4. zuvor ernsthaft, mit dem nötigen Zeitaufwand und ohne Ausübung unzulässigen Drucks versucht wurde, den Betreuten von der Notwendigkeit der ärztlichen Maßnahme zu überzeugen,", "5. der drohende erhebliche gesundheitliche Schaden durch keine andere den Betreuten weniger belastende Maßnahme abgewendet werden kann,", "6. der zu erwartende Nutzen der ärztlichen Zwangsmaßnahme die zu erwartenden Beeinträchtigungen deutlich überwiegt und", "7. die ärztliche Zwangsmaßnahme im Rahmen eines stationären Aufenthalts in einem Krankenhaus, in dem die gebotene medizinische Versorgung des Betreuten einschließlich einer erforderlichen Nachbehandlung sichergestellt ist, durchgeführt wird.", "§ 1867 ist nur anwendbar, wenn der Betreuer an der Erfüllung seiner Pflichten verhindert ist.", "(2) Die Einwilligung in die ärztliche Zwangsmaßnahme bedarf der Genehmigung des Betreuungsgerichts.", "(3) Der Betreuer hat die Einwilligung in die ärztliche Zwangsmaßnahme zu widerrufen, wenn ihre Voraussetzungen weggefallen sind. Er hat den Widerruf dem Betreuungsgericht unverzüglich anzuzeigen.", "(4) Kommt eine ärztliche Zwangsmaßnahme in Betracht, so gilt für die Verbringung des Betreuten gegen seinen natürlichen Willen zu einem stationären Aufenthalt in ein Krankenhaus § 1831 Absatz 1 Nummer 2, Absatz 2 und 3 Satz 1 entsprechend.", "(5) Die Absätze 1 bis 4 gelten nach Maßgabe des § 1820 Absatz 2 Nummer 3 für einen Bevollmächtigten entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1832.html"}, {"id": "bgb1833", "g": "BGB", "n": "§ 1833 BGB", "t": "Aufgabe von Wohnraum des Betreuten", "x": ["(1) Eine Aufgabe von Wohnraum, der vom Betreuten selbst genutzt wird, durch den Betreuer ist nur nach Maßgabe des § 1821 Absatz 2 bis 4 zulässig. Eine Gefährdung im Sinne des § 1821 Absatz 3 Nummer 1 liegt insbesondere dann vor, wenn eine Finanzierung des Wohnraums trotz Ausschöpfung aller dem Betreuten zur Verfügung stehenden Ressourcen nicht möglich ist oder eine häusliche Versorgung trotz umfassender Zuhilfenahme aller ambulanten Dienste zu einer erheblichen gesundheitlichen Gefährdung des Betreuten führen würde.", "(2) Beabsichtigt der Betreuer, vom Betreuten selbst genutzten Wohnraum aufzugeben, so hat er dies unter Angabe der Gründe und der Sichtweise des Betreuten dem Betreuungsgericht unverzüglich anzuzeigen. Ist mit einer Aufgabe des Wohnraums aus anderen Gründen zu rechnen, so hat der Betreuer auch dies sowie die von ihm beabsichtigten Maßnahmen dem Betreuungsgericht unverzüglich anzuzeigen, wenn sein Aufgabenkreis die entsprechende Angelegenheit umfasst.", "(3) Der Betreuer bedarf bei vom Betreuten selbst genutzten Wohnraum der Genehmigung des Betreuungsgerichts 1. zur Kündigung des Mietverhältnisses,", "2. zu einer Willenserklärung, die auf die Aufhebung des Mietverhältnisses gerichtet ist,", "3. zur Vermietung solchen Wohnraums und", "4. zur Verfügung über ein Grundstück oder über ein Recht an einem Grundstück, sofern dies mit der Aufgabe des Wohnraums verbunden ist.", "Die §§ 1855 bis 1858 gelten entsprechend."], "u": "https://www.gesetze-im-internet.de/bgb/__1833.html"}, {"id": "bgb1834", "g": "BGB", "n": "§ 1834 BGB", "t": "Bestimmung des Umgangs und des Aufenthalts des Betreuten", "x": ["(1) Den Umgang des Betreuten mit anderen Personen darf der Betreuer mit Wirkung für und gegen Dritte nur bestimmen, wenn der Betreute dies wünscht oder ihm eine konkrete Gefährdung im Sinne des § 1821 Absatz 3 Nummer 1 droht.", "(2) Die Bestimmung des Aufenthalts umfasst das Recht, den Aufenthalt des Betreuten auch mit Wirkung für und gegen Dritte zu bestimmen und, falls erforderlich, die Herausgabe des Betreuten zu verlangen.", "(3) Über Streitigkeiten, die eine Angelegenheit nach Absatz 1 oder 2 betreffen, entscheidet das Betreuungsgericht auf Antrag."], "u": "https://www.gesetze-im-internet.de/bgb/__1834.html"}, {"id": "bgb1816", "g": "BGB", "n": "§ 1816 BGB", "t": "Eignung und Auswahl des Betreuers; Berücksichtigung der Wünsche des Volljährigen", "x": ["(1) Das Betreuungsgericht bestellt einen Betreuer, der geeignet ist, in dem gerichtlich angeordneten Aufgabenkreis die Angelegenheiten des Betreuten nach Maßgabe des § 1821 rechtlich zu besorgen und insbesondere in dem hierfür erforderlichen Umfang persönlichen Kontakt mit dem Betreuten zu halten.", "(2) Wünscht der Volljährige eine Person als Betreuer, so ist diesem Wunsch zu entsprechen, es sei denn, die gewünschte Person ist zur Führung der Betreuung nach Absatz 1 nicht geeignet. Lehnt der Volljährige eine bestimmte Person als Betreuer ab, so ist diesem Wunsch zu entsprechen, es sei denn, die Ablehnung bezieht sich nicht auf die Person des Betreuers, sondern auf die Bestellung eines Betreuers als solche. Die Sätze 1 und 2 gelten auch für Wünsche, die der Volljährige vor Einleitung des Betreuungsverfahrens geäußert hat, es sei denn, dass er an diesen erkennbar nicht festhalten will. Wer von der Einleitung eines Verfahrens über die Bestellung eines Betreuers für einen Volljährigen Kenntnis erlangt und ein Dokument besitzt, in dem der Volljährige für den Fall, dass für ihn ein Betreuer bestellt werden muss, Wünsche zur Auswahl des Betreuers oder zur Wahrnehmung der Betreuung geäußert hat (Betreuungsverfügung), hat die Betreuungsverfügung dem Betreuungsgericht zu übermitteln.", "(3) Schlägt der Volljährige niemanden vor, der zum Betreuer bestellt werden kann oder ist die gewünschte Person nicht geeignet, so sind bei der Auswahl des Betreuers die familiären Beziehungen des Volljährigen, insbesondere zum Ehegatten, zu Eltern und zu Kindern, seine persönlichen Bindungen sowie die Gefahr von Interessenkonflikten zu berücksichtigen.", "(4) Eine Person, die keine familiäre Beziehung oder persönliche Bindung zu dem Volljährigen hat, soll nur dann zum ehrenamtlichen Betreuer bestellt werden, wenn sie mit einem nach § 14 des Betreuungsorganisationsgesetzes anerkannten Betreuungsverein oder mit der zuständigen Behörde eine Vereinbarung über eine Begleitung und Unterstützung gemäß § 15 Absatz 1 Satz 1 Nummer 4 oder § 5 Absatz 2 Satz 3 des Betreuungsorganisationsgesetzes geschlossen hat.", "(5) Ein beruflicher Betreuer nach § 19 Absatz 2 des Betreuungsorganisationsgesetzes soll nur dann zum Betreuer bestellt werden, wenn keine geeignete Person für die ehrenamtliche Führung der Betreuung zur Verfügung steht. Bei der Entscheidung, ob ein bestimmter beruflicher Betreuer bestellt wird, sind die Anzahl und der Umfang der bereits von diesem zu führenden Betreuungen zu berücksichtigen.", "(6) Eine Person, die zu einem Träger von Einrichtungen oder Diensten, der in der Versorgung des Volljährigen tätig ist, in einem Abhängigkeitsverhältnis oder in einer anderen engen Beziehung steht, darf nicht zum Betreuer bestellt werden. Dies gilt nicht, wenn im Einzelfall die konkrete Gefahr einer Interessenkollision nicht besteht."], "u": "https://www.gesetze-im-internet.de/bgb/__1816.html"}, {"id": "bgb1819", "g": "BGB", "n": "§ 1819 BGB", "t": "Übernahmepflicht; weitere Bestellungsvoraussetzungen", "x": ["(1) Die vom Betreuungsgericht ausgewählte Person ist verpflichtet, die Betreuung zu übernehmen, wenn ihr die Übernahme unter Berücksichtigung ihrer familiären, beruflichen und sonstigen Verhältnisse zugemutet werden kann.", "(2) Die ausgewählte Person darf erst dann zum Betreuer bestellt werden, wenn sie sich zur Übernahme der Betreuung bereit erklärt hat.", "(3) Ein Mitarbeiter eines anerkannten Betreuungsvereins, der dort ausschließlich oder teilweise als Betreuer tätig ist (Vereinsbetreuer), darf nur mit Einwilligung des Betreuungsvereins bestellt werden. Entsprechendes gilt für den Mitarbeiter einer Betreuungsbehörde, der als Betreuer bestellt wird (Behördenbetreuer)."], "u": "https://www.gesetze-im-internet.de/bgb/__1819.html"}, {"id": "bgb1862", "g": "BGB", "n": "§ 1862 BGB", "t": "Aufsicht durch das Betreuungsgericht", "x": ["(1) Das Betreuungsgericht führt über die gesamte Tätigkeit des Betreuers die Aufsicht. Es hat dabei auf die Einhaltung der Pflichten des Betreuers zu achten und insbesondere bei Anordnungen nach Absatz 3, der Erteilung von Genehmigungen und einstweiligen Maßnahmen nach § 1867 den in § 1821 Absatz 2 bis 4 festgelegten Maßstab zu beachten.", "(2) Das Betreuungsgericht hat den Betreuten persönlich anzuhören, wenn Anhaltspunkte dafür bestehen, dass der Betreuer pflichtwidrig den Wünschen des Betreuten nicht oder nicht in geeigneter Weise entspricht oder seinen Pflichten gegenüber dem Betreuten in anderer Weise nicht nachkommt, es sei denn, die persönliche Anhörung ist nicht geeignet oder nicht erforderlich, um die Pflichtwidrigkeit aufzuklären.", "(3) Das Betreuungsgericht hat gegen Pflichtwidrigkeiten des Betreuers durch geeignete Gebote und Verbote einzuschreiten. Zur Befolgung seiner Anordnungen kann es den Betreuer durch die Festsetzung von Zwangsgeld anhalten. Gegen die Betreuungsbehörde, einen Behördenbetreuer oder einen Betreuungsverein wird kein Zwangsgeld festgesetzt.", "(4) Durch Landesrecht kann bestimmt werden, dass Vorschriften, welche die Aufsicht des Betreuungsgerichts in vermögensrechtlicher Hinsicht sowie beim Abschluss von Ausbildungs-, Dienst- oder Arbeitsverträgen betreffen, gegenüber der Betreuungsbehörde außer Anwendung bleiben."], "u": "https://www.gesetze-im-internet.de/bgb/__1862.html"}, {"id": "famfg298", "g": "FamFG", "n": "§ 298 FamFG", "t": "Verfahren in Fällen des § 1829 des Bürgerlichen Gesetzbuchs", "x": ["(1) Das Gericht darf die Einwilligung, die Nichteinwilligung oder den Widerruf einer Einwilligung eines Betreuers oder eines Bevollmächtigten (§ 1829 Absatz 1, 2 und 5 des Bürgerlichen Gesetzbuchs) nur genehmigen, wenn es den Betroffenen zuvor persönlich angehört hat. Das Gericht soll die sonstigen Beteiligten anhören. Auf Verlangen des Betroffenen hat das Gericht eine ihm nahestehende Person anzuhören, wenn dies ohne erhebliche Verzögerung möglich ist.", "(2) Die Bestellung eines Verfahrenspflegers ist stets erforderlich, wenn Gegenstand des Verfahrens eine Genehmigung nach § 1829 Absatz 2 des Bürgerlichen Gesetzbuchs ist.", "(3) Vor der Genehmigung ist ein Sachverständigengutachten einzuholen. Der Sachverständige soll nicht auch der behandelnde Arzt sein."], "u": "https://www.gesetze-im-internet.de/famfg/__298.html"}, {"id": "famfg312", "g": "FamFG", "n": "§ 312 FamFG", "t": "Unterbringungssachen", "x": ["Unterbringungssachen sind Verfahren, die die Genehmigung oder Anordnung einer 1. freiheitsentziehenden Unterbringung nach § 1831 Absatz 1 und 2 auch in Verbindung mit Absatz 5 des Bürgerlichen Gesetzbuchs,", "2. freiheitsentziehenden Maßnahme nach § 1831 Absatz 4 auch in Verbindung mit Absatz 5 des Bürgerlichen Gesetzbuchs,", "3. ärztlichen Zwangsmaßnahme, auch einschließlich einer Verbringung zu einem stationären Aufenthalt, nach § 1832 Absatz 1, 2 und 4 auch in Verbindung mit Absatz 5 des Bürgerlichen Gesetzbuchs oder", "4. freiheitsentziehenden Unterbringung, freiheitsentziehenden Maßnahme oder ärztlichen Zwangsmaßnahme bei Volljährigen nach den Landesgesetzen über die Unterbringung psychisch Kranker", "betreffen (Unterbringungsmaßnahme)."], "u": "https://www.gesetze-im-internet.de/famfg/__312.html"}, {"id": "famfg313", "g": "FamFG", "n": "§ 313 FamFG", "t": "Örtliche Zuständigkeit", "x": ["(1) Ausschließlich zuständig für Unterbringungssachen nach § 312 Nummer 1 bis 3 ist in dieser Rangfolge: 1. das Gericht, bei dem ein Verfahren zur Bestellung eines Betreuers eingeleitet oder das Betreuungsverfahren anhängig ist;", "2. das Gericht, in dessen Bezirk der Betroffene seinen gewöhnlichen Aufenthalt hat;", "3. das Gericht, in dessen Bezirk das Bedürfnis für die Unterbringungsmaßnahme hervortritt;", "4. das Amtsgericht Schöneberg in Berlin, wenn der Betroffene Deutscher ist.", "(2) Für einstweilige Anordnungen oder einstweilige Maßregeln ist auch das Gericht zuständig, in dessen Bezirk das Bedürfnis für die Unterbringungsmaßnahme bekannt wird. In den Fällen einer einstweiligen Anordnung oder einstweiligen Maßregel soll es dem nach Absatz 1 Nr. 1 oder Nr. 2 zuständigen Gericht davon Mitteilung machen.", "(3) Ausschließlich zuständig für Unterbringungsmaßnahmen nach § 312 Nummer 4 ist das Gericht, in dessen Bezirk das Bedürfnis für die Unterbringungsmaßnahme hervortritt. Befindet sich der Betroffene bereits in einer Einrichtung zur freiheitsentziehenden Unterbringung, ist das Gericht ausschließlich zuständig, in dessen Bezirk die Einrichtung liegt.", "(4) Ist für die Unterbringungssache ein anderes Gericht zuständig als dasjenige, bei dem ein die Unterbringung erfassendes Verfahren zur Bestellung eines Betreuers eingeleitet ist, teilt dieses Gericht dem für die Unterbringungssache zuständigen Gericht die Aufhebung der Betreuung, den Wegfall des Aufgabenbereiches Unterbringung und einen Wechsel in der Person des Betreuers mit. Das für die Unterbringungssache zuständige Gericht teilt dem anderen Gericht die Unterbringungsmaßnahme, ihre Änderung, Verlängerung und Aufhebung mit."], "u": "https://www.gesetze-im-internet.de/famfg/__313.html"}, {"id": "famfg319", "g": "FamFG", "n": "§ 319 FamFG", "t": "Persönliche Anhörung des Betroffenen", "x": ["(1) Das Gericht hat den Betroffenen vor einer Unterbringungsmaßnahme persönlich anzuhören und sich einen persönlichen Eindruck von ihm zu verschaffen. Den persönlichen Eindruck verschafft sich das Gericht, soweit dies erforderlich ist, in der üblichen Umgebung des Betroffenen.", "(2) In der Anhörung erörtert das Gericht mit dem Betroffenen das Verfahren, das Ergebnis des übermittelten Gutachtens und die mögliche Dauer einer Unterbringung. Hat das Gericht dem Betroffenen nach § 317 einen Verfahrenspfleger bestellt, soll die persönliche Anhörung in dessen Anwesenheit stattfinden.", "(3) Soll eine persönliche Anhörung nach § 34 Abs. 2 unterbleiben, weil hiervon erhebliche Nachteile für die Gesundheit des Betroffenen zu besorgen sind, darf diese Entscheidung nur auf Grundlage eines ärztlichen Gutachtens getroffen werden. Unterbleibt aus diesem Grund die persönliche Anhörung, so bedarf es auch keiner Verschaffung eines persönlichen Eindrucks.", "(4) Verfahrenshandlungen nach Absatz 1 sollen nicht im Wege der Rechtshilfe erfolgen.", "(5) Das Gericht kann den Betroffenen durch die zuständige Behörde vorführen lassen, wenn er sich weigert, an Verfahrenshandlungen nach Absatz 1 mitzuwirken.", "(6) Gewalt darf die Behörde nur anwenden, wenn das Gericht dies ausdrücklich angeordnet hat. Die zuständige Behörde ist befugt, erforderlichenfalls um Unterstützung der polizeilichen Vollzugsorgane nachzusuchen.", "(7) Die Wohnung des Betroffenen darf ohne dessen Einwilligung nur gewaltsam geöffnet, betreten und durchsucht werden, wenn das Gericht dies zu dessen Vorführung zur Anhörung ausdrücklich angeordnet hat. Bei Gefahr im Verzug kann die Anordnung nach Satz 1 durch die zuständige Behörde erfolgen. Durch diese Regelung wird das Grundrecht auf Unverletzlichkeit der Wohnung aus Artikel 13 Absatz 1 des Grundgesetzes eingeschränkt."], "u": "https://www.gesetze-im-internet.de/famfg/__319.html"}, {"id": "famfg321", "g": "FamFG", "n": "§ 321 FamFG", "t": "Einholung eines Gutachtens", "x": ["(1) Vor einer Unterbringungsmaßnahme hat eine förmliche Beweisaufnahme durch Einholung eines Gutachtens über die Notwendigkeit der Maßnahme stattzufinden. Der Sachverständige hat den Betroffenen vor der Erstattung des Gutachtens persönlich zu untersuchen oder zu befragen. Das Gutachten soll sich auch auf die voraussichtliche Dauer der Unterbringungsmaßnahme erstrecken. Der Sachverständige soll Arzt für Psychiatrie sein; er muss Arzt mit Erfahrung auf dem Gebiet der Psychiatrie sein. Bei der Genehmigung einer Einwilligung in eine ärztliche Zwangsmaßnahme oder bei deren Anordnung soll der Sachverständige nicht der zwangsbehandelnde Arzt sein.", "(2) Für eine freiheitsentziehende Maßnahme nach § 312 Nummer 2 oder 4 genügt ein ärztliches Zeugnis."], "u": "https://www.gesetze-im-internet.de/famfg/__321.html"}, {"id": "famfg331", "g": "FamFG", "n": "§ 331 FamFG", "t": "Einstweilige Anordnung", "x": ["Das Gericht kann durch einstweilige Anordnung eine vorläufige Unterbringungsmaßnahme anordnen oder genehmigen, wenn 1. dringende Gründe für die Annahme bestehen, dass die Voraussetzungen für die Genehmigung oder Anordnung einer Unterbringungsmaßnahme gegeben sind und ein dringendes Bedürfnis für ein sofortiges Tätigwerden besteht,", "2. ein ärztliches Zeugnis über den Zustand des Betroffenen und über die Notwendigkeit der Maßnahme vorliegt; der Arzt, der das ärztliche Zeugnis ausstellt, soll Arzt für Psychiatrie sein; er muss Erfahrung auf dem Gebiet der Psychiatrie haben; dies gilt nicht für freiheitsentziehende Maßnahmen nach § 312 Nummer 2 und 4,", "3. im Fall des § 317 ein Verfahrenspfleger bestellt und angehört worden ist und", "4. der Betroffene persönlich angehört worden ist.", "Eine Anhörung des Betroffenen im Wege der Rechtshilfe ist abweichend von § 319 Abs. 4 zulässig."], "u": "https://www.gesetze-im-internet.de/famfg/__331.html"}, {"id": "famfg333", "g": "FamFG", "n": "§ 333 FamFG", "t": "Dauer der einstweiligen Anordnung", "x": ["(1) Die einstweilige Anordnung darf die Dauer von sechs Wochen nicht überschreiten. Reicht dieser Zeitraum nicht aus, kann sie nach Anhörung eines Sachverständigen durch eine weitere einstweilige Anordnung verlängert werden. Die mehrfache Verlängerung ist unter den Voraussetzungen der Sätze 1 und 2 zulässig. Sie darf die Gesamtdauer von drei Monaten nicht überschreiten. Eine Unterbringung zur Vorbereitung eines Gutachtens (§ 322) ist in diese Gesamtdauer einzubeziehen.", "(2) Die einstweilige Anordnung darf bei der Genehmigung einer Einwilligung in eine ärztliche Zwangsmaßnahme oder deren Anordnung die Dauer von zwei Wochen nicht überschreiten. Bei mehrfacher Verlängerung darf die Gesamtdauer sechs Wochen nicht überschreiten."], "u": "https://www.gesetze-im-internet.de/famfg/__333.html"}];
+const LAWBY=Object.fromEntries(LAW.map(o=>[o.id,o]));
+
+
+/* ---------- Zustand ---------- */
+const KEY="m5-lernpfad-v1";
+let S={done:{},known:{},best:{},exdone:{},notes:{},tab:"path"};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stName=id=>ST.find(s=>s.id===id).t;
+
+/* ---------- Fortschritt ---------- */
+function progress(){
+  const d=ST.filter(s=>S.done[s.id]).length;
+  const known=Object.keys(S.known).length;
+  $("#p-text").textContent=d+" von "+ST.length+" Stationen abgeschlossen";
+  $("#p-extra").textContent=known+" von "+CD.length+" Karten gewusst · "+Object.keys(S.exdone||{}).length+" von "+EX.length+" Übungen";
+  $("#p-bar").style.width=Math.round(d/ST.length*100)+"%";
+}
+
+
+/* ---------- Lernpfad ---------- */
+function blockHTML(b){
+  const h=b.h?"<h3>"+b.h+"</h3>":"";
+  switch(b.k){
+    case "p":return '<div class="blk">'+h+"<p>"+b.t+"</p></div>";
+    case "ul":return '<div class="blk">'+h+"<ul>"+b.i.map(x=>"<li>"+x+"</li>").join("")+"</ul></div>";
+    case "ol":return '<div class="blk">'+h+"<ol>"+b.i.map(x=>"<li>"+x+"</li>").join("")+"</ol></div>";
+    case "grid":return '<div class="blk">'+h+'<div class="grid">'+b.i.map(x=>'<div class="gc"><b>'+x[0]+"</b><span>"+x[1]+"</span></div>").join("")+"</div></div>";
+    case "table":return '<div class="blk">'+h+'<div class="tw"><table><thead><tr>'+b.c.map(c=>"<th>"+c+"</th>").join("")+"</tr></thead><tbody>"+b.r.map(r=>"<tr>"+r.map(c=>"<td>"+c+"</td>").join("")+"</tr>").join("")+"</tbody></table></div></div>";
+    case "note":return '<div class="blk"><div class="note">'+b.t+"</div></div>";
+    case "law":return '<div class="blk">'+h+b.ids.map(i=>lawHTML(LAWBY[i])).join("")+"</div>";
+    case "quote":return '<div class="blk"><blockquote class="quote">„'+b.t+"“<small>"+b.by+"</small></blockquote></div>";
+  }return "";
+}
+function renderPath(){
+  const firstOpen=ST.find(s=>!S.done[s.id]);
+  const openIds=$$(".st.open").map(e=>+e.dataset.id);
+  $("#path").innerHTML=ST.map(s=>{
+    const cls=["st"];if(S.done[s.id])cls.push("done");else if(firstOpen&&firstOpen.id===s.id)cls.push("next");
+    if(openIds.includes(s.id))cls.push("open");
+    const chips=s.src.split("").map(c=>'<span class="chip '+SCLS[c]+'">'+SRC[c]+"</span>").join("");
+    const nq=QZ.filter(q=>q[0]===s.id).length, nc=CD.filter(c=>c[0]===s.id).length;
+    return '<li class="'+cls.join(" ")+'" data-id="'+s.id+'"><div class="node">'+(S.done[s.id]?"✓":s.id)+'</div>'+
+    '<button class="st-head" data-act="toggle" aria-expanded="'+openIds.includes(s.id)+'"><div class="chips">'+chips+'<span class="chip state">'+(S.done[s.id]?"abgeschlossen":(cls.includes("next")?"als Nächstes":"offen"))+'</span></div><h2>'+s.t+'</h2><p>'+s.teaser+'</p></button>'+
+    '<div class="st-body">'+s.b.map(blockHTML).join("")+
+    '<div class="acts"><button class="btn '+(S.done[s.id]?"ok":"pri")+'" data-act="done">'+(S.done[s.id]?"✓ Abgeschlossen (zurücknehmen)":"Als abgeschlossen markieren")+'</button>'+
+    '<button class="btn" data-act="quiz">Quiz zu diesem Thema ('+nq+')</button><button class="btn" data-act="cards">Karten dazu ('+nc+')</button></div></div></li>';
+  }).join("");
+}
+$("#path").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const li=b.closest(".st"),id=+li.dataset.id;
+  if(b.dataset.act==="toggle"){const o=li.classList.toggle("open");b.setAttribute("aria-expanded",o)}
+  else if(b.dataset.act==="done"){S.done[id]=!S.done[id];if(!S.done[id])delete S.done[id];save();renderPath();progress();$(".st[data-id='"+id+"']").classList.add("open")}
+  else if(b.dataset.act==="quiz"){$("#q-topic").value=id;setTab("quiz");startQuiz()}
+  else if(b.dataset.act==="cards"){$("#c-topic").value=id;setTab("cards");buildDeck()}
+});
+
+/* ---------- Tabs ---------- */
+function setTab(t){
+  S.tab=t;save();
+  $$(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  $(".bubble").hidden=t!=="path";
+  ["path","quiz","cards","laws","ex"].forEach(v=>$("#v-"+v).hidden=v!==t);
+  window.scrollTo({top:0});
+}
+$$(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+
+
+/* ---------- Gesetze ---------- */
+function lawHTML(o){
+  return '<details class="law"><summary><b>'+esc(o.n)+'</b> <span>'+esc(o.t)+'</span></summary><div class="lawx">'+
+  o.x.map(l=>'<p>'+esc(l)+'</p>').join("")+
+  '<a class="src" href="'+esc(o.u)+'" target="_blank" rel="noopener">Amtlicher Text auf gesetze-im-internet.de</a></div></details>';
+}
+let LF="all";
+function renderLaws(){
+  const q=($("#l-q").value||"").trim().toLowerCase();
+  const list=LAW.filter(o=>(LF==="all"||o.g===LF)&&(!q||(o.n+" "+o.t+" "+o.x.join(" ")).toLowerCase().includes(q)));
+  $("#l-list").innerHTML=list.length?list.map(lawHTML).join(""):'<div class="panel empty">Keine Vorschrift gefunden.</div>';
+  $("#l-count").textContent=list.length+" von "+LAW.length+" Vorschriften";
+}
+$("#l-q").addEventListener("input",renderLaws);
+$("#l-f").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;LF=b.dataset.f;$$("#l-f button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderLaws()});
+
+/* ---------- Übungen ---------- */
+const EX=[{id:"navigator"},{id:"faelle"},{id:"reflexion"}];
+const NAV={
+ n0:{q:"Ist der Betreute für die konkrete Maßnahme einwilligungsfähig?",hint:"Maßnahmenbezogen prüfen, nicht allgemein (Station 3).",y:"r_self",n:"n1"},
+ n1:{q:"Gehört die Gesundheitssorge zum Aufgabenkreis, oder deckt eine wirksame Vollmacht die Maßnahme ab?",hint:"Ohne Befugnis darf der Betreuer nicht einwilligen (Station 1).",y:"n2",n:"r_noauth"},
+ n2:{q:"Widerspricht die Maßnahme dem natürlichen Willen des Betreuten?",hint:"Dann kommt eine ärztliche Zwangsmaßnahme in Betracht (Station 5).",y:"r_zwang",n:"n3"},
+ n3:{q:"Liegt eine Patientenverfügung vor, die auf die aktuelle Lebens- und Behandlungssituation zutrifft?",hint:"§ 1827 Abs. 1 BGB, Bestimmtheit nach der BGH-Rechtsprechung (Station 7).",y:"n5",n:"n4",ty:"Wille: Patientenverfügung, ihm Ausdruck und Geltung verschaffen.",},
+ n4:{q:"Lassen sich die Behandlungswünsche des Betreuten feststellen?",hint:"Wenn nicht, wird der mutmaßliche Wille anhand konkreter Anhaltspunkte ermittelt (Station 6).",y:"n5",n:"n5",ty:"Wille: festgestellte Behandlungswünsche.",tn:"Wille: mutmaßlicher Wille aus früheren Äußerungen und Wertvorstellungen."},
+ n5:{q:"Besteht begründete Gefahr von Tod oder schwerem, länger dauerndem Schaden, durch die Maßnahme oder durch deren Unterbleiben oder Abbruch?",hint:"§ 1829 Abs. 1 und 2 BGB (Station 4).",y:"n6",n:"r_ok"},
+ n6:{q:"Sind Betreuer und behandelnder Arzt einig, dass die Entscheidung dem festgestellten Willen entspricht?",hint:"§ 1829 Abs. 4 BGB: Einvernehmen ersetzt die Genehmigung.",y:"r_einv",n:"n7"},
+ n7:{q:"Ist mit dem Aufschub der Maßnahme Gefahr verbunden?",hint:"§ 1829 Abs. 1 Satz 2 BGB.",y:"r_eil",n:"r_gen"}
+};
+const RES={
+ r_self:{t:"Der Betreute entscheidet selbst",x:"Ein einwilligungsfähiger Betreuter willigt selbst ein oder lehnt ab. Der Betreuer berät und unterstützt, vertritt aber nicht. Die Aufklärung richtet sich an den Betreuten (§ 630e BGB).",st:[3]},
+ r_noauth:{t:"Keine Befugnis des Betreuers",x:"Fehlt der Aufgabenkreis Gesundheitssorge, ist beim Betreuungsgericht eine Erweiterung anzuregen. Eine Vollmacht muss die Maßnahme erfassen und bei Maßnahmen nach § 1820 Abs. 2 BGB schriftlich und ausdrücklich sein.",st:[1,7]},
+ r_zwang:{t:"Ärztliche Zwangsmaßnahme prüfen (§ 1832 BGB)",x:"Alle sieben Voraussetzungen müssen vorliegen, stationär im Krankenhaus. Die Einwilligung braucht die Genehmigung des Betreuungsgerichts. Verfahren: §§ 312 ff. FamFG.",st:[5]},
+ r_ok:{t:"Entscheidung durch den Betreuer, keine Genehmigung",x:"Der Betreuer willigt nach dem festgestellten Willen ein oder lehnt ab. Aufklärung einholen, Entscheidung erklären und dokumentieren.",st:[6,3]},
+ r_einv:{t:"Keine Genehmigung bei Einvernehmen",x:"Bei Einvernehmen von Betreuer und Arzt über den festgestellten Willen entfällt die Genehmigung (§ 1829 Abs. 4 BGB). Das Gespräch nach § 1828 BGB und seine Ergebnisse sorgfältig dokumentieren.",st:[4,6]},
+ r_eil:{t:"Eilfall: Maßnahme ohne vorherige Genehmigung",x:"Bei Gefahr im Aufschub darf die Maßnahme ohne Genehmigung erfolgen (§ 1829 Abs. 1 Satz 2 BGB). Das Gericht sollte unverzüglich informiert werden.",st:[4]},
+ r_gen:{t:"Genehmigung beim Betreuungsgericht beantragen",x:"Genehmigung nach § 1829 BGB beantragen. Das Gericht hört den Betroffenen persönlich an, holt ein Gutachten ein und bestellt bei Nichteinwilligung oder Widerruf einen Verfahrenspfleger (§ 298 FamFG). Sie ist zu erteilen, wenn die Entscheidung dem Willen entspricht.",st:[4]}
+};
+let NV={cur:"n0",log:[],res:null};
+function renderNav(){
+  const a=$("#nav-area");
+  const log=NV.log.map(l=>'<li><span>'+esc(l.q)+'</span> <b>'+(l.a?"Ja":"Nein")+'</b>'+(l.note?'<small> · '+esc(l.note)+'</small>':"")+'</li>').join("");
+  let body;
+  if(NV.res){
+    const r=RES[NV.res];
+    body='<div class="note"><b>Ergebnis: '+esc(r.t)+'</b><br>'+esc(r.x)+'</div><div class="acts" style="border:0;padding-top:12px">'+
+      r.st.map(n=>'<button class="btn sm" data-go="st:'+n+'">Station '+n+' im Lernpfad</button>').join("")+
+      '<button class="btn" data-nav="back">Zurück</button><button class="btn pri" data-nav="reset">Neu starten</button></div>';
+  }else{
+    const n=NAV[NV.cur];
+    body='<p class="qtext" style="font-size:1.15rem">'+esc(n.q)+'</p><p class="hint" style="margin:0 0 12px">'+esc(n.hint)+'</p>'+
+      '<div class="acts" style="border:0;padding-top:0"><button class="btn pri" data-nav="y">Ja</button><button class="btn" data-nav="n">Nein</button>'+
+      (NV.log.length?'<button class="btn sm" data-nav="back">Zurück</button>':"")+'</div>';
+  }
+  a.innerHTML=(log?'<ol class="navlog">'+log+'</ol>':"")+body;
+}
+function navStep(yes){
+  const n=NAV[NV.cur];const nx=yes?n.y:n.n;
+  NV.log.push({id:NV.cur,q:n.q,a:yes,note:yes?n.ty:n.tn});
+  if(RES[nx]){NV.res=nx}else{NV.cur=nx}
+  renderNav();
+}
+const CASES=[
+ {t:"Fall 1: Hüftoperation",s:"Frau M. (82) lebt mit fortgeschrittener Demenz im Pflegeheim. Du bist Betreuer für die Gesundheitssorge. Nach einem Sturz empfiehlt die Klinik eine Hüftoperation mit erheblichem Narkoserisiko. Die Tochter drängt auf die Operation, Frau M. wirkt ablehnend, äußert sich aber widersprüchlich.",q:"Wie gehst du vor, und braucht deine Entscheidung eine Genehmigung?",a:["Einwilligungsfähigkeit für diese Maßnahme prüfen und dokumentieren.","Aufklärung des Betreuers (§ 630e Abs. 4 BGB), Frau M. nach ihrem Verständnis einbeziehen.","Wünsche feststellen, sonst mutmaßlichen Willen ermitteln, auch durch Anhörung der Tochter (§ 1821 Abs. 4, § 1827 Abs. 2 BGB).","Gespräch mit dem Arzt nach § 1828 BGB.","Besteht begründete Gefahr von Tod oder schwerem Schaden, ist die Genehmigung nach § 1829 Abs. 1 BGB nötig, außer bei Einvernehmen mit dem Arzt über den festgestellten Willen (Abs. 4) oder in einem Eilfall.","Der Wille entscheidet, nicht der Wunsch der Tochter."]},
+ {t:"Fall 2: Patientenverfügung und Magensonde",s:"Herr K. hat in einer Patientenverfügung festgehalten: „Ich wünsche keine lebenserhaltenden Maßnahmen.“ Nach einem schweren Schlaganfall ist er nicht ansprechbar. Der Arzt hält eine Magensonde für indiziert. Der Sohn sagt, die Verfügung gelte.",q:"Ist die Patientenverfügung bindend?",a:["Prüfen, ob die Festlegungen auf die aktuelle Situation zutreffen (§ 1827 Abs. 1 BGB).","Die Formel „keine lebenserhaltenden Maßnahmen“ allein ist nach dem BGH meist zu unbestimmt (XII ZB 61/16, XII ZB 604/15). Es kommt auf konkrete Situationen und Maßnahmen an.","Trifft sie nicht zu, gilt die Stufenfolge weiter: Behandlungswünsche, dann mutmaßlicher Wille (§ 1827 Abs. 2 BGB).","Gespräch mit dem Arzt (§ 1828 BGB), Angehörige und Vertrauenspersonen anhören.","Besteht kein Einvernehmen, ist bei Gefahr für das Leben die Genehmigung nach § 1829 Abs. 2 BGB zu beantragen, mit Verfahrenspfleger (§ 298 Abs. 2 FamFG)."]},
+ {t:"Fall 3: Medikation gegen den Willen",s:"Herr S. ist wegen akuter Psychose im geschlossenen Bereich einer Klinik untergebracht und lehnt die notwendige Medikation entschieden ab. Er erkennt seine Erkrankung nicht.",q:"Was ist rechtlich zu beachten?",a:["Unterbringung nach § 1831 BGB genehmigt? Freiheitsentziehung braucht Genehmigung.","Medikation gegen den natürlichen Willen ist eine ärztliche Zwangsmaßnahme nach § 1832 BGB.","Alle sieben Voraussetzungen prüfen, vor allem den ernsthaften Überzeugungsversuch und das mildeste Mittel.","Genehmigung des Betreuungsgerichts, Verfahren nach §§ 312 ff. FamFG, Gutachten nicht durch den zwangsbehandelnden Arzt (§ 321 FamFG).","Einstweilige Anordnung höchstens zwei Wochen, insgesamt sechs Wochen (§ 333 Abs. 2 FamFG).","Einwilligung widerrufen, sobald die Voraussetzungen entfallen (§ 1832 Abs. 3 BGB)."]},
+ {t:"Fall 4: „Ich will nicht mehr leben“",s:"Frau B. (79) lebt im Heim, hat Schmerzen, ihr Mann ist vor einem Jahr gestorben. Sie sagt dir bei einem Besuch: „Ich will nicht mehr leben.“",q:"Wie reagierst du als Betreuer?",a:["Den Satz ernst nehmen, ruhig nachfragen, zuhören und nicht abwehren.","Hintergründe klären: Schmerzen, Einsamkeit, Trauer, Depression. Ärztliche und psychiatrische Abklärung veranlassen.","Hilfen eröffnen: Schmerz- und Palliativversorgung, Seelsorge, soziale Kontakte, Telefonseelsorge (0800 111 0 111).","Bei akuter Selbsttötungsgefahr kommt eine Unterbringung nach § 1831 Abs. 1 Nr. 1 BGB in Betracht, in Notfällen den Notruf 112 nutzen.","Mitwirkung an einer Selbsttötung gehört nicht zu den Aufgaben des Betreuers."]}
+];
+const REF=[
+ "Wie gehe ich mit dem Thema Sterben und Tod um, wenn ein Betreuter es anspricht?",
+ "Welche Gefühle löst es bei mir aus, wenn ein Betreuter eine Behandlung ablehnt, die ich für richtig halte?",
+ "Woran erkenne ich bei einem Betreuten, dass ich seinen Willen und nicht meinen eigenen durchsetze?",
+ "Habe ich selbst eine Patientenverfügung oder Vorsorgevollmacht? Was würde ich darin regeln?",
+ "Welche Unterstützung brauche ich, wenn mich eine Entscheidung belastet?"
+];
+function exState(id){return S.exdone&&S.exdone[id]}
+function renderEx(){
+  const done=id=>'<div class="acts"><button class="btn '+(exState(id)?"ok":"")+'" data-exdone="'+id+'">'+(exState(id)?"✓ Erledigt (zurücknehmen)":"Als erledigt markieren")+'</button></div>';
+  const notes=S.notes||{};
+  $("#ex-list").innerHTML=
+  '<article class="ex'+(exState("navigator")?" done":"")+'"><div class="kick">Interaktiv · Stationen 3 bis 7</div><h3>Entscheidungs-Navigator</h3><p>Beantworte der Reihe nach die Prüffragen. Am Ende steht das Ergebnis mit Verweis auf die passenden Stationen.</p><div id="nav-area"></div>'+done("navigator")+'</article>'+
+  '<article class="ex'+(exState("faelle")?" done":"")+'"><div class="kick">Fälle · Stationen 4 bis 8</div><h3>Vier Fälle mit Lösungsskizze</h3><p>Überlege zuerst selbst, dann klappe die Lösungsskizze auf.</p>'+
+  CASES.map(c=>'<h4>'+esc(c.t)+'</h4><div class="story">'+esc(c.s)+'</div><p><b>'+esc(c.q)+'</b></p><details class="rv"><summary><span>Lösungsskizze anzeigen</span></summary><ul>'+c.a.map(x=>"<li>"+esc(x)+"</li>").join("")+'</ul></details>').join("")+done("faelle")+'</article>'+
+  '<article class="ex'+(exState("reflexion")?" done":"")+'"><div class="kick">Reflexion · Station 9</div><h3>Eigene Haltung klären</h3><p>Fünf Fragen zur Selbstreflexion. Deine Notizen bleiben nur in diesem Browser.</p>'+
+  REF.map((r,i)=>'<h4>'+esc(r)+'</h4><textarea data-note="'+i+'" rows="3" aria-label="Notiz zu Frage '+(i+1)+'">'+esc(notes[i]||"")+'</textarea>').join("")+
+  '<div class="note" style="margin-top:12px"><b>Wenn dich ein Thema belastet:</b> Die Telefonseelsorge ist kostenfrei und rund um die Uhr erreichbar: 0800 111 0 111 oder 0800 111 0 222. In akuter Gefahr gilt der Notruf 112. Die Übung ersetzt keine Beratung oder Therapie.</div>'+
+  '<div class="acts"><button class="btn" data-exnotes="clear">Notizen löschen</button></div>'+done("reflexion")+'</article>';
+  renderNav();
+}
+$("#ex-list").addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");
+  if(g&&g.dataset.go.startsWith("st:")){goStation(+g.dataset.go.slice(3));return}
+  const nb=e.target.closest("[data-nav]");
+  if(nb){
+    const k=nb.dataset.nav;
+    if(k==="y")navStep(true);else if(k==="n")navStep(false);
+    else if(k==="reset"){NV={cur:"n0",log:[],res:null};renderNav()}
+    else if(k==="back"){if(NV.res){NV.res=null;const l=NV.log.pop();NV.cur=l.id}else{const l=NV.log.pop();if(l)NV.cur=l.id}renderNav()}
+    return;
+  }
+  const d=e.target.closest("[data-exdone]");
+  if(d){const id=d.dataset.exdone;S.exdone=S.exdone||{};if(S.exdone[id])delete S.exdone[id];else S.exdone[id]=true;save();renderEx();progress();return}
+  if(e.target.closest("[data-exnotes]")){S.notes={};save();renderEx()}
+});
+$("#ex-list").addEventListener("input",e=>{
+  const t=e.target.closest("[data-note]");if(!t)return;
+  S.notes=S.notes||{};S.notes[t.dataset.note]=t.value;save();
+});
+function goStation(id){
+  setTab("path");
+  const li=$(".st[data-id='"+id+"']");if(!li)return;
+  li.classList.add("open");const h=$(".st-head",li);if(h)h.setAttribute("aria-expanded","true");
+  if(li.scrollIntoView)li.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ---------- Themenwahl ---------- */
+function fillTopics(sel,list,idx){
+  sel.innerHTML='<option value="0">Alle Themen ('+list.length+')</option>'+ST.map(s=>'<option value="'+s.id+'">'+s.id+". "+esc(s.t)+" ("+list.filter(x=>x[0]===s.id).length+")</option>").join("");
+}
+fillTopics($("#q-topic"),QZ);fillTopics($("#c-topic"),CD);
+
+/* ---------- Quiz ---------- */
+let QN=10,Q=null;
+$("#q-count").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;QN=+b.dataset.n;$$("#q-count button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$("#q-start").addEventListener("click",startQuiz);
+function startQuiz(){
+  const t=+$("#q-topic").value;
+  let pool=QZ.filter(q=>!t||q[0]===t);
+  pool=shuffle(pool).slice(0,QN);
+  Q={t,list:pool,i:0,score:0,wrong:[],log:[],done:false};
+  showQ();
+}
+function showQ(){
+  const a=$("#q-area");
+  if(Q.i>=Q.list.length){return showResult()}
+  const q=Q.list[Q.i];
+  const opts=shuffle([{t:q[2],ok:true}].concat(q[3].map(t=>({t,ok:false}))));
+  Q.cur={q,opts,answered:false};
+  a.innerHTML='<div class="panel"><div class="qmeta"><span>Frage '+(Q.i+1)+" von "+Q.list.length+'</span><span>'+esc(stName(q[0]))+'</span></div><div class="bar"><i style="width:'+Math.round(Q.i/Q.list.length*100)+'%"></i></div>'+
+  '<div class="qtext" id="qt">'+esc(q[1])+'</div><div class="opts" role="group" aria-labelledby="qt">'+opts.map((o,i)=>'<button class="opt" data-i="'+i+'"><span class="l">'+"ABCD"[i]+"</span><span>"+esc(o.t)+"</span></button>").join("")+'</div><div id="q-fb" aria-live="polite"></div></div>';
+}
+function srcOf(id){const s=ST.find(x=>x.id===id);return s?s.src.split("").map(c=>SRC[c]).join(", "):""}
+function verdict(pct){return pct>=90?"Hervorragend – sehr sicher im Stoff.":pct>=75?"Gut – die Grundlagen sitzen, einzelne Lücken schließen.":pct>=50?"Solide Basis – wiederhole die markierten Themen.":"Noch unsicher – arbeite die markierten Stationen im Lernpfad durch."}
+$("#q-area").addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&Q&&Q.cur&&!Q.cur.answered){
+    const c=Q.cur;c.answered=true;
+    const pick=c.opts[+o.dataset.i];
+    $$(".opt").forEach((b,i)=>{b.disabled=true;if(c.opts[i].ok)b.classList.add("right")});
+    if(pick.ok){Q.score++}else{o.classList.add("wrong");Q.wrong.push(c.q)}
+    Q.log.push({q:c.q,picked:pick.t,ok:pick.ok});
+    const last=Q.i===Q.list.length-1,done=Q.i+1;
+    $("#q-fb").innerHTML='<div class="fb '+(pick.ok?"good":"bad")+'"><b>'+(pick.ok?"✓ Richtig":"✗ Nicht ganz")+'</b>'+
+    '<div class="ev"><div><span>Deine Antwort</span>'+esc(pick.t)+'</div>'+(pick.ok?"":'<div><span>Richtig ist</span>'+esc(c.q[2])+'</div>')+
+    '<div><span>Erklärung</span>'+esc(c.q[4])+'</div>'+
+    '<div><span>Fundstelle</span>Station '+c.q[0]+' – '+esc(stName(c.q[0]))+' ('+esc(srcOf(c.q[0]))+')</div></div>'+
+    '<div class="run">Zwischenstand: '+Q.score+' von '+done+' richtig ('+Math.round(Q.score/done*100)+' %)</div></div>'+
+    '<div class="acts" style="border:0;padding-top:0"><button class="btn pri" id="q-next">'+(last?"Gesamtauswertung ansehen":"Nächste Frage")+"</button></div>";
+    $("#q-next").focus();
+  }
+  if(e.target.closest("#q-next")){Q.i++;showQ()}
+  if(e.target.closest("#q-again"))startQuiz();
+  if(e.target.closest("#q-wrongonly")){Q={t:Q.t,list:shuffle(Q.wrong),i:0,score:0,wrong:[],log:[]};showQ()}
+  const g=e.target.closest("[data-goto]");
+  if(g){const id=+g.dataset.goto;setTab("path");$$(".st").forEach(x=>x.classList.toggle("open",+x.dataset.id===id));const el=$(".st[data-id='"+id+"']");if(el)el.scrollIntoView({block:"start"})}
+});
+function showResult(){
+  const n=Q.list.length,pct=Math.round(Q.score/n*100);
+  const key=Q.t||0;
+  if(!S.best[key]||pct>S.best[key]){S.best[key]=pct;save()}
+  // je Station
+  const by={};Q.log.forEach(l=>{const id=l.q[0];(by[id]=by[id]||{n:0,ok:0});by[id].n++;if(l.ok)by[id].ok++});
+  const ids=Object.keys(by).map(Number).sort((a,b)=>a-b);
+  const rows=ids.map(id=>{const r=by[id],p=Math.round(r.ok/r.n*100);return '<div class="srow"><div class="sn"><b>'+id+'. '+esc(stName(id))+'</b><span>'+r.ok+' von '+r.n+' richtig · '+p+' %</span></div><div class="bar"><i style="width:'+p+'%"></i></div>'+(p<100?'<button class="btn sm" data-goto="'+id+'">Im Lernpfad nachlesen</button>':"")+'</div>'});
+  const strong=ids.filter(id=>by[id].ok===by[id].n).map(id=>id+". "+stName(id));
+  const weak=ids.filter(id=>by[id].ok<by[id].n).sort((a,b)=>by[a].ok/by[a].n-by[b].ok/by[b].n).map(id=>id+". "+stName(id));
+  const det=Q.log.map((l,i)=>'<details class="rv '+(l.ok?"good":"bad")+'"'+(l.ok?"":" open")+'><summary><span class="mk">'+(l.ok?"✓":"✗")+'</span><span>'+(i+1)+". "+esc(l.q[1])+'</span></summary><div class="ev">'+
+    '<div><span>Deine Antwort</span>'+esc(l.picked)+'</div>'+(l.ok?"":'<div><span>Richtig ist</span>'+esc(l.q[2])+'</div>')+
+    '<div><span>Erklärung</span>'+esc(l.q[4])+'</div>'+
+    '<div><span>Fundstelle</span>Station '+l.q[0]+' – '+esc(stName(l.q[0]))+' ('+esc(srcOf(l.q[0]))+') <button class="btn sm" data-goto="'+l.q[0]+'">Zur Station</button></div></div></details>').join("");
+  $("#q-area").innerHTML='<div class="panel"><div class="qmeta"><span>Gesamtauswertung</span><span>Bestwert in diesem Thema: '+S.best[key]+' %</span></div>'+
+  '<div class="score">'+Q.score+" / "+n+' <small>('+pct+' %)</small></div><p><b>'+verdict(pct)+'</b></p>'+
+  '<p>Du hast '+Q.score+' von '+n+' Fragen richtig beantwortet'+(Q.wrong.length?' und '+Q.wrong.length+' falsch.':'.')+'</p>'+
+  '<h3 style="margin-top:18px">Ergebnis nach Themen</h3><div class="srows">'+rows.join("")+'</div>'+
+  (strong.length?'<p class="sum"><b>Stärken:</b> '+esc(strong.join("; "))+'</p>':"")+
+  (weak.length?'<p class="sum"><b>Empfehlung:</b> Wiederhole zuerst '+esc(weak.slice(0,3).join("; "))+'. Lies die Station im Lernpfad und übe danach mit „Nur falsche Fragen üben“.</p>':'<p class="sum"><b>Empfehlung:</b> Alles richtig. Wähle als Nächstes ein anderes Thema oder mehr Fragen.</p>')+
+  '<h3 style="margin-top:18px">Alle Fragen ausführlich erklärt</h3><p class="lead" style="margin:4px 0 10px">Falsch beantwortete Fragen sind aufgeklappt. Die Erklärungen nennen die Rechtsgrundlagen.</p><div class="rvs">'+det+'</div>'+
+  '<div class="acts"><button class="btn pri" id="q-again">Neue Runde</button>'+(Q.wrong.length?'<button class="btn" id="q-wrongonly">Nur falsche Fragen üben</button>':"")+"</div></div>";
+  window.scrollTo({top:$("#v-quiz").offsetTop,behavior:"smooth"});
+}
+
+/* ---------- Karten ---------- */
+let C={deck:[],i:0,flip:false},CM="all";
+$("#c-topic").addEventListener("change",buildDeck);
+$("#c-mode").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;CM=b.dataset.m;$$("#c-mode button").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()});
+$("#c-shuffle").addEventListener("click",()=>{C.deck=shuffle(C.deck);C.i=0;C.flip=false;drawCard()});
+function buildDeck(){
+  const t=+$("#c-topic").value;
+  C.deck=CD.map((c,i)=>({c,i})).filter(x=>(!t||x.c[0]===t)&&(CM==="all"||!S.known[x.i]));
+  C.i=0;C.flip=false;drawCard();
+}
+function drawCard(){
+  const a=$("#c-area");
+  if(!C.deck.length){a.innerHTML='<div class="panel empty">Keine offenen Karten in diesem Thema. Du hast alle gewusst.<div class="acts" style="justify-content:center;border:0"><button class="btn" id="c-reset">Fortschritt dieses Themas zurücksetzen</button></div></div>';return}
+  const d=C.deck[C.i],known=!!S.known[d.i];
+  a.innerHTML='<div class="qmeta"><span>Karte '+(C.i+1)+" von "+C.deck.length+"</span><span>"+esc(stName(d.c[0]))+(known?" · gewusst":"")+'</span></div>'+
+  '<div class="stage"><button class="card'+(C.flip?" flip":"")+'" id="card" aria-label="Karte umdrehen"><span class="face front"><small>Frage</small><p>'+esc(d.c[1])+'</p></span><span class="face back"><small>Antwort</small><p>'+esc(d.c[2])+"</p></span></button></div>"+
+  '<div class="cc"><button class="btn" data-c="prev" aria-label="Vorherige Karte">← Zurück</button><div class="mid"><button class="btn" data-c="again">Nochmal</button><button class="btn pri" data-c="know">Gewusst</button></div><button class="btn" data-c="next" aria-label="Nächste Karte">Weiter →</button></div>'+
+  '<p class="hint">Tastatur: Pfeil links und rechts blättern, Leertaste dreht um.</p>';
+}
+$("#c-area").addEventListener("click",e=>{
+  if(e.target.closest("#card")){C.flip=!C.flip;$("#card").classList.toggle("flip",C.flip);return}
+  if(e.target.closest("#c-reset")){const t=+$("#c-topic").value;CD.forEach((c,i)=>{if(!t||c[0]===t)delete S.known[i]});save();progress();buildDeck();return}
+  const b=e.target.closest("[data-c]");if(!b)return;
+  const d=C.deck[C.i],m=b.dataset.c;
+  if(m==="know"){S.known[d.i]=1;save();progress();if(CM==="open"){C.deck.splice(C.i,1);if(C.i>=C.deck.length)C.i=0}else C.i=(C.i+1)%C.deck.length}
+  else if(m==="again"){delete S.known[d.i];save();progress();C.i=(C.i+1)%C.deck.length}
+  else if(m==="next")C.i=(C.i+1)%C.deck.length;
+  else if(m==="prev")C.i=(C.i-1+C.deck.length)%C.deck.length;
+  C.flip=false;drawCard();
+});
+document.addEventListener("keydown",e=>{
+  if(S.tab!=="cards"||!C.deck.length||/SELECT|INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
+  if(e.key==="ArrowRight"){C.i=(C.i+1)%C.deck.length;C.flip=false;drawCard()}
+  else if(e.key==="ArrowLeft"){C.i=(C.i-1+C.deck.length)%C.deck.length;C.flip=false;drawCard()}
+  else if(e.key===" "&&document.activeElement.id!=="card"&&!document.activeElement.closest(".btn")){e.preventDefault();C.flip=!C.flip;$("#card").classList.toggle("flip",C.flip)}
+});
+
+/* ---------- Start ---------- */
+$("#q-area").innerHTML='<div class="panel empty">Wähle Thema und Länge, dann „Quiz starten“. Es gibt '+QZ.length+" Fragen zu allen "+ST.length+" Stationen.</div>";
+renderPath();progress();buildDeck();
+renderEx();renderLaws();progress();
+setTab(["path","quiz","cards","laws","ex"].includes(S.tab)?S.tab:"path");
+</script>
+
+<!--rechtstexte-->
+<div id="rt-footer-host"></div>
+<template id="rt-footer-tpl"><style>
+:host{display:block;all:initial}
+.bar{display:block;box-sizing:border-box;width:100%;margin:2.5rem 0 0;padding:.9rem 1rem 1.2rem;text-align:center;font:12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#8a8a8a}
+.bar button{all:unset;cursor:pointer;color:#8a8a8a;text-decoration:underline;text-underline-offset:2px;padding:.2rem .35rem;border-radius:4px}
+.bar button:hover,.bar button:focus-visible{color:#555}
+.bar button:focus-visible{outline:2px solid #888}
+dialog{box-sizing:border-box;width:min(720px,calc(100vw - 2rem));max-height:85vh;overflow:auto;border:1px solid #ccc;border-radius:10px;padding:1.2rem 1.4rem;background:#fff;color:#222;font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+h2{margin:0 0 .6rem;font-size:1.25rem}h3{margin:1rem 0 .3rem;font-size:1rem}p{margin:.3rem 0}.st{color:#777;font-size:.85rem;margin-top:1rem}
+.x{position:sticky;top:0;float:right;background:#eee;color:#222;border:0;border-radius:6px;padding:.3rem .7rem;cursor:pointer;font:inherit}
+@media (prefers-color-scheme:dark){.bar,.bar button{color:#8d8d8d}dialog{background:#1f1f1f;color:#e6e6e6;border-color:#444}.x{background:#333;color:#eee}.st{color:#999}}
+</style>
+<div class="bar"><button type="button" data-open="imp">Impressum</button> · <button type="button" data-open="dat">Datenschutz</button></div>
+<dialog id="imp" aria-labelledby="imp-t"><button class="x" type="button" data-close>Schließen</button><h2 id="imp-t">Impressum</h2><h3>Angaben gemäß § 5 DDG</h3>
+<p>crosspublish media GmbH<br>Leipziger Str. 27<br>09648 Mittweida<br>Deutschland</p>
+<p>Vertreten durch den Geschäftsführer: Michael Ascheron</p>
+<h3>Kontakt</h3>
+<p>Telefon: +49 (0) 3727 9760<br>E-Mail: info@crosspublish.de</p>
+<h3>Register und Steuer</h3>
+<p>Registergericht: Amtsgericht Chemnitz, HRB 31759<br>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: DE318536831</p>
+<h3>Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)</h3>
+<p>Michael Ascheron, Anschrift wie oben</p>
+<h3>Verbraucherstreitbeilegung</h3>
+<p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG). Die Angebote richten sich ausschließlich an Unternehmer im Sinne des § 14 BGB sowie an Teilnehmende von Fortbildungen zu Lernzwecken.</p>
+<h3>Haftung für Inhalte und Links</h3>
+<p>Die Inhalte dieser Seite dienen der Lernunterstützung und ersetzen keine Rechtsberatung. Für Inhalte externer Links sind ausschließlich deren Betreiber verantwortlich; zum Zeitpunkt der Verlinkung waren keine Rechtsverstöße erkennbar. Bei Bekanntwerden von Rechtsverletzungen entfernen wir entsprechende Links umgehend.</p>
+<h3>Urheberrecht</h3>
+<p>Eigene Inhalte unterliegen dem deutschen Urheberrecht. Gesetzestexte sind gemeinfrei (§ 5 UrhG); Inhalte Dritter (z. B. Wikipedia, Wikimedia Commons) bleiben unter deren jeweiligen Lizenzen.</p>
+<p class="st">Stand: Oktober 2026</p></dialog>
+<dialog id="dat" aria-labelledby="dat-t"><button class="x" type="button" data-close>Schließen</button><h2 id="dat-t">Datenschutzerklärung</h2><h3>1. Verantwortlicher</h3><p>Verantwortlich im Sinne der Datenschutz-Grundverordnung (DSGVO) ist die crosspublish media GmbH, Leipziger Str. 27, 09648 Mittweida, Deutschland, E-Mail: info@crosspublish.de. Anfragen zum Datenschutz richten Sie bitte an diese Adresse.</p>
+<h3>2. Hosting und Server-Logdateien</h3><p>Diese Seite wird bei Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, USA, gehostet. Beim Aufruf verarbeitet der Hosting-Anbieter technisch notwendige Verbindungsdaten (IP-Adresse, Datum und Uhrzeit, aufgerufene Datei, Browser- und Betriebssysteminformationen, Referrer), um die Seite auszuliefern und die Sicherheit des Angebots zu gewährleisten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem sicheren und stabilen Betrieb). Mit dem Anbieter besteht ein Auftragsverarbeitungsverhältnis nach Art. 28 DSGVO. Soweit Daten in die USA übermittelt werden, stützt sich die Übermittlung auf den Angemessenheitsbeschluss der EU-Kommission zum EU-U.S. Data Privacy Framework bzw. auf Standardvertragsklauseln (Art. 45, 46 DSGVO). Die Logdaten werden nach Ablauf der vom Anbieter festgelegten kurzen Fristen gelöscht.</p>
+<h3>3. Zugriffsschutz</h3><p>Der Zugriff auf diese Seite kann auf angemeldete Mitglieder eines Teams beschränkt sein. Bei der Anmeldung verarbeitet Netlify die dafür nötigen Kontodaten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+<h3>4. Schriftarten</h3><p>Zur einheitlichen Darstellung lädt diese Seite Schriftarten von externen Servern: Google Fonts (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, sowie Google LLC, USA). Dabei wird Ihre IP-Adresse an den jeweiligen Anbieter übermittelt, der daraus ableiten kann, dass die Seite aufgerufen wurde. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (einheitliche, ansprechende Darstellung). Eine Übermittlung in Drittländer stützt sich, soweit erforderlich, auf das EU-U.S. Data Privacy Framework bzw. Standardvertragsklauseln. Sie können dem Laden jederzeit widersprechen, etwa durch einen Schriftarten- oder Skriptblocker; die Seite wird dann mit Ersatzschriften angezeigt.</p>
+<h3>5. Lokale Speicherung im Browser</h3><p>Diese Seite speichert Einstellungen und Ihren Lernstand (z. B. gemerkte Antworten oder Filter) im lokalen Speicher Ihres Browsers (Local Storage). Die Daten verbleiben auf Ihrem Gerät und werden nicht an uns oder Dritte übertragen. Die Speicherung ist für die von Ihnen gewünschte Funktion erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG); die anschließende Verarbeitung beruht auf Art. 6 Abs. 1 lit. f DSGVO. Sie können die Daten jederzeit in den Browsereinstellungen löschen. Es werden keine Cookies zu Analyse- oder Werbezwecken gesetzt.</p>
+<h3>6. Keine Analyse, keine Werbung</h3><p>Wir setzen keine Webanalyse-, Tracking- oder Werbedienste ein und verarbeiten keine Kontaktformulare oder Newsletter-Daten über diese Seite.</p>
+<h3>7. Externe Links und Inhalte</h3><p>Diese Seite enthält Links zu externen Angeboten (z. B. Gesetzestexte, Wikipedia, Anbieterseiten). Beim Anklicken gelten die Datenschutzbestimmungen der jeweiligen Betreiber; auf deren Datenverarbeitung haben wir keinen Einfluss.</p>
+<h3>8. Ihre Rechte</h3><p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) sowie Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO). Eine erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO). Wenden Sie sich dazu an info@crosspublish.de. Außerdem haben Sie das Recht, sich bei einer Aufsichtsbehörde zu beschweren (Art. 77 DSGVO), z. B. beim Sächsischen Datenschutz- und Transparenzbeauftragten, Devrientstraße 5, 01067 Dresden.</p>
+<p class="st">Stand: Oktober 2026</p></dialog></template>
+<script>(function(){try{var h=document.getElementById('rt-footer-host'),t=document.getElementById('rt-footer-tpl');if(!h||!t)return;var r=h.attachShadow({mode:'open'});r.appendChild(t.content.cloneNode(true));r.addEventListener('click',function(e){var o=e.target.closest('[data-open]'),c=e.target.closest('[data-close]'),d=e.target.tagName==='DIALOG'?e.target:null;if(o){r.getElementById(o.dataset.open).showModal()}else if(c){c.closest('dialog').close()}else if(d){d.close()}})}catch(x){}})();</script>
+<!--/rechtstexte-->
