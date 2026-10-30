@@ -264,7 +264,7 @@ textarea{resize:vertical}
   <!-- ÜBUNGEN -->
   <section id="v-ex" aria-labelledby="t-ex" hidden>
     <h2 class="sec">Übungen</h2>
-    <p class="lead">Ein Entscheidungs-Navigator, vier Fälle mit Lösungsskizze und Reflexionsfragen. Notizen bleiben nur in deinem Browser.</p>
+    <p class="lead">Ein Entscheidungs-Navigator, vier Fälle mit Lösungsskizze, Reflexionsfragen und der Fragebogen A15. Notizen bleiben nur in deinem Browser.</p>
     <div class="exl" id="ex-list"></div>
   </section>
 
@@ -671,7 +671,8 @@ $("#l-q").addEventListener("input",renderLaws);
 $("#l-f").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;LF=b.dataset.f;$$("#l-f button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderLaws()});
 
 /* ---------- Übungen ---------- */
-const EX=[{id:"navigator"},{id:"faelle"},{id:"reflexion"}];
+const EX=[{id:"navigator"},{id:"faelle"},{id:"reflexion"},{id:"a15"}];
+const A15URL="https://m05-a15.netlify.app/";
 const NAV={
  n0:{q:"Ist der Betreute für die konkrete Maßnahme einwilligungsfähig?",hint:"Maßnahmenbezogen prüfen, nicht allgemein (Station 3).",y:"r_self",n:"n1"},
  n1:{q:"Gehört die Gesundheitssorge zum Aufgabenkreis, oder deckt eine wirksame Vollmacht die Maßnahme ab?",hint:"Ohne Befugnis darf der Betreuer nicht einwilligen (Station 1).",y:"n2",n:"r_noauth"},
@@ -739,12 +740,17 @@ function renderEx(){
   '<article class="ex'+(exState("reflexion")?" done":"")+'"><div class="kick">Reflexion · Station 9</div><h3>Eigene Haltung klären</h3><p>Fünf Fragen zur Selbstreflexion. Deine Notizen bleiben nur in diesem Browser.</p>'+
   REF.map((r,i)=>'<h4>'+esc(r)+'</h4><textarea data-note="'+i+'" rows="3" aria-label="Notiz zu Frage '+(i+1)+'">'+esc(notes[i]||"")+'</textarea>').join("")+
   '<div class="note" style="margin-top:12px"><b>Wenn dich ein Thema belastet:</b> Die Telefonseelsorge ist kostenfrei und rund um die Uhr erreichbar: 0800 111 0 111 oder 0800 111 0 222. In akuter Gefahr gilt der Notruf 112. Die Übung ersetzt keine Beratung oder Therapie.</div>'+
-  '<div class="acts"><button class="btn" data-exnotes="clear">Notizen löschen</button></div>'+done("reflexion")+'</article>';
+  '<div class="acts"><button class="btn" data-exnotes="clear">Notizen löschen</button></div>'+done("reflexion")+'</article>'+
+  '<article class="ex'+(exState("a15")?" done":"")+'" data-id="a15"><div class="kick">Fragebogen · Station 9</div><h3>A15 Auseinandersetzung mit Tod und Sterben</h3><p>Fragebogen mit 58 Fragen zur Selbstreflexion. Er hilft, die eigene Haltung zu Tod und Sterben zu klären, eine gute Grundlage für Gespräche mit Betreuten. Antworten lassen sich als PDF oder JSON speichern.</p>'+
+  '<div class="acts" style="border:0;padding-top:0"><button class="btn pri" data-frame="a15">Hier öffnen</button><a class="btn" href="'+A15URL+'" target="_blank" rel="noopener">In neuem Tab öffnen</a><button class="btn sm" data-go="st:9">Station 9</button></div>'+
+  '<div class="ex-frame" id="fr-a15" hidden></div>'+done("a15")+'</article>';
   renderNav();
 }
 $("#ex-list").addEventListener("click",e=>{
   const g=e.target.closest("[data-go]");
   if(g&&g.dataset.go.startsWith("st:")){goStation(+g.dataset.go.slice(3));return}
+  const fb=e.target.closest("[data-frame]");
+  if(fb){const fr=$("#fr-a15");if(fr.hidden){if(!fr.firstChild){fr.innerHTML='<iframe src="'+A15URL+'" title="A15 Fragebogen" loading="lazy"></iframe>'}fr.hidden=false;fb.textContent="Schließen"}else{fr.hidden=true;fb.textContent="Hier öffnen"}return}
   const nb=e.target.closest("[data-nav]");
   if(nb){
     const k=nb.dataset.nav;
@@ -767,6 +773,10 @@ function goStation(id){
   li.classList.add("open");const h=$(".st-head",li);if(h)h.setAttribute("aria-expanded","true");
   if(li.scrollIntoView)li.scrollIntoView({behavior:"smooth",block:"start"});
 }
+
+/* Verweis von Station 9 auf den Fragebogen */
+ST.find(s=>s.id===9).b.push({k:"note",t:"<b>Zum Üben:</b> Der <a class=\"go\" data-go=\"ex:a15\">Fragebogen A15</a> zur Auseinandersetzung mit Tod und Sterben und die Reflexionsfragen im Bereich Übungen."});
+$("#path").addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g&&g.dataset.go==="ex:a15"){setTab("ex");const a=$(".ex[data-id='a15']");if(a&&a.scrollIntoView)a.scrollIntoView({behavior:"smooth",block:"start"})}});
 
 /* ---------- Themenwahl ---------- */
 function fillTopics(sel,list,idx){
